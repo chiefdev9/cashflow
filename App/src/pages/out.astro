@@ -1,9 +1,4 @@
 ---
-/* 
-   FILE: out.astro
-   DESKRIPSI: Form Input Transaksi Out (Layout Presisi 1 Layar HP).
-*/
-
 import { Image } from 'astro:assets';
 import '../styles/global.css';
 ---
@@ -21,144 +16,195 @@ import '../styles/global.css';
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Menyesuaikan Tinggi Viewport HP (h-dvh) -->
+    <!-- Container Utama: Pas 1 layar HP (h-dvh) -->
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
-        <!-- HEADER FORM -->
-        <header class="bg-white p-4 pb-4 rounded-b-[2rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0">
-            <!-- Background Vektor Header -->
-            <div class="absolute inset-0 opacity-20 pointer-events-none overflow-hidden flex items-center justify-center">
-                <Image
-                    src="/bg.jpg"
-                    alt="Aksen Vektor Header"
+        <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0">
+            <div class="absolute inset-0 opacity-40 pointer-events-none overflow-hidden flex items-center justify-center">
+                <Image 
+                    src="/bg.jpg" 
+                    alt="Aksen Vektor Header" 
                     width={800}
                     height={600}
                     class="w-full h-full object-cover scale-125 transform"
                 />
             </div>
 
-            <!-- Top Bar Navigasi Kembali -->
-            <div class="flex justify-between items-center relative z-10">
-                <a href="/" class="w-8 h-8 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm active:scale-95 transition">
+            <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
+                <a href="/" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                 </a>
-                <h1 class="text-sm font-bold text-slate-800">Tambah Pengeluaran</h1>
-                <div class="w-8 h-8 opacity-0"></div> <!-- Spacer penyeimbang layout -->
+                <h2 class="text-sm font-bold text-slate-800">Tambah Transaksi Baru</h2>
+                <div class="w-9"></div>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
+                <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
+                    Pemasukan (In)
+                </a>
+                <a href="/out" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-rose-600 text-white shadow-xs cursor-pointer">
+                    Pengeluaran (Out)
+                </a>
             </div>
         </header>
 
-        <!-- KONTEN FORM (FIT LAYAR) -->
-        <main class="flex-1 overflow-y-auto p-4 pb-24 flex flex-col justify-between">
-            <form id="form-out" class="space-y-4">
-                <!-- Nominal / Jumlah -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nominal (Rp)</label>
+        <!-- Main Form Content -->
+        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-20">
+            <form id="formOut" class="space-y-3 sm:space-y-4">
+                
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Nominal Pengeluaran
+                    </label>
                     <div class="relative flex items-center">
-                        <span class="absolute left-3 text-sm font-bold text-rose-500">Rp</span>
+                        <span class="text-lg font-bold text-slate-400 mr-2">Rp</span>
                         <input 
-                            type="number" 
-                            id="input-jumlah"
-                            required
-                            placeholder="0"
-                            class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-sm"
+                            id="nominal"
+                            type="text" 
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="0" 
+                            class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300"
                         />
                     </div>
                 </div>
 
-                <!-- Kategori -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Kategori</label>
-                    <select id="input-kategori" class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl font-medium text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Sumber
+                    </label>
+                    <select id="sumber" class="w-full text-sm font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
                         <option value="Rutin">Rutin</option>
-                        <option value="Prediksi">Prediksi</option>
-                        <option value="Usaha">Usaha</option>
-                        <option value="Lainnya">Lainnya</option>
+                        <option value="Tentatif">Tentatif</option>
                     </select>
                 </div>
 
-                <!-- Deskripsi / Keterangan -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Deskripsi / Item</label>
-                    <input 
-                        type="text" 
-                        id="input-deskripsi"
-                        required
-                        placeholder="Contoh: Bayar Kosan, Beli Makan"
-                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
-                    />
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                            Kategori
+                        </label>
+                        <select id="kategori" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
+                            <option>Kebutuhan Pokok</option>
+                            <option>Transportasi</option>
+                            <option>Hiburan</option>
+                            <option>Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                            Tanggal
+                        </label>
+                        <input 
+                            id="waktu"
+                            type="date" 
+                            class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer"
+                        />
+                    </div>
                 </div>
 
-                <!-- Tanggal Transaksi -->
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tanggal</label>
-                    <input 
-                        type="date" 
-                        id="input-tanggal"
-                        required
-                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
-                    />
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Catatan (Opsional)
+                    </label>
+                    <textarea 
+                        id="catatan"
+                        rows="2"
+                        placeholder="Tambahkan detail catatan jika perlu..." 
+                        class="w-full text-xs text-slate-800 focus:outline-none bg-transparent placeholder-slate-300 resize-none font-medium"
+                    ></textarea>
                 </div>
             </form>
         </main>
 
-        <!-- FLOATING ACTION BUTTON (Presisi & Sejajar seperti tombol index.astro) -->
-        <div class="absolute bottom-4 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-20">
-            <a href="/" class="pointer-events-auto bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2.5 rounded-xl shadow-md flex items-center justify-center space-x-1.5 transition transform active:scale-95 no-underline">
-                <span class="text-xs font-semibold">Batal</span>
-            </a>
-            <button 
-                type="submit" 
-                form="form-out"
-                class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-md flex items-center justify-center space-x-2 transition transform active:scale-95">
-                <span class="text-base font-bold">-</span>
-                <span class="text-xs font-semibold">Simpan Pengeluaran</span>
+        <!-- Tombol Bawah Melayang Pas 1 Layar -->
+        <div class="absolute bottom-3 left-0 right-0 px-4 z-20">
+            <button id="btnSimpan" type="button" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-md text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span id="btnText">Simpan Pengeluaran</span>
             </button>
         </div>
 
     </div>
 
-    <!-- SCRIPT SIMPAN KE SUPABASE -->
     <script>
-        import { createClient } from '@supabase/supabase-js';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyeeT_RzPM3EXQ6uHjcoQCN6nybPHLKWwVHLxq3xQVvaohIjht0grtxMTItSM851Xk/exec';
 
-        const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
+        const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
-        // Auto fill tanggal hari ini
-        const inputTanggal = document.getElementById('input-tanggal') as HTMLInputElement;
-        if (inputTanggal) {
-            inputTanggal.valueToDate = new Date();
-            inputTanggal.value = new Date().toISOString().split('T')[0];
+        if (waktuEl) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            waktuEl.value = `${yyyy}-${mm}-${dd}`;
         }
 
-        const formOut = document.getElementById('form-out');
-        formOut?.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        nominalEl?.addEventListener('input', (e) => {
+            const input = e.target as HTMLInputElement;
+            let value = input.value.replace(/\D/g, '');
+            
+            if (value) {
+                value = Number(value).toLocaleString('en-US');
+            }
+            
+            input.value = value;
+        });
 
-            const jumlah = (document.getElementById('input-jumlah') as HTMLInputElement).value;
-            const kategori = (document.getElementById('input-kategori') as HTMLSelectElement).value;
-            const deskripsi = (document.getElementById('input-deskripsi') as HTMLInputElement).value;
-            const tanggal = (document.getElementById('input-tanggal') as HTMLInputElement).value;
+        const btn = document.getElementById('btnSimpan') as HTMLButtonElement | null;
+        const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
 
-            const { data, error } = await supabase
-                .from('transactions') // sesuaikan nama tabel kamu
-                .insert([
-                    { 
-                        type: 'out',
-                        amount: Number(jumlah), 
-                        category: kategori, 
-                        description: deskripsi, 
-                        date: tanggal 
-                    }
-                ]);
+        btn?.addEventListener('click', async () => {
+            if (!btn) return;
+            
+            if (btnText) btnText.innerText = 'Menyimpan...';
+            btn.disabled = true;
 
-            if (error) {
-                alert('Gagal menyimpan transaksi: ' + error.message);
-            } else {
-                window.location.href = '/';
+            const sumberEl = document.getElementById('sumber') as HTMLSelectElement | null;
+            const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
+            const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
+
+            const rawNominal = nominalEl ? nominalEl.value.replace(/,/g, '') : '';
+
+            let formattedDate = '';
+            if (waktuEl && waktuEl.value) {
+                const [y, m, d] = waktuEl.value.split('-');
+                formattedDate = `${parseInt(m)}/${parseInt(d)}/${y}`;
+            }
+
+            const formBody = new URLSearchParams({
+                jenis: 'Out', // <-- Penanda satpam agar masuk ke lembar kerja Out
+                angka: rawNominal,
+                sumber: sumberEl ? sumberEl.value : '',
+                kategori: kategoriEl ? kategoriEl.value : '',
+                waktu: formattedDate,
+                catatan: catatanEl ? catatanEl.value : ''
+            });
+
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formBody.toString()
+                });
+                
+                alert('Pengeluaran berhasil disimpan!');
+                window.location.reload();
+
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+                console.error('Error!', error);
+                if (btnText) btnText.innerText = 'Simpan Pengeluaran';
+                btn.disabled = false;
             }
         });
     </script>
