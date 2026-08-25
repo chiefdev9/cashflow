@@ -1,7 +1,7 @@
 ---
 /* 
    FILE: index.astro
-   DESKRIPSI: Dashboard Mobile-First Cashflow (No-Scroll Single Screen View).
+   DESKRIPSI: Dashboard Mobile-First Cashflow (Single Screen Fit dengan UI Transaksi Original).
 */
 
 import { Image } from 'astro:assets';
@@ -21,11 +21,11 @@ import '../styles/global.css';
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Menyesuaikan Tinggi Viewport HP Secara Presisi (h-dvh) -->
-    <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200 justify-between">
+    <!-- Container Utama: Menyesuaikan Tinggi Viewport HP (h-dvh) -->
+    <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
-        <!-- HEADER / SALDO -->
-        <header class="bg-white p-3.5 pb-4 rounded-b-3xl shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0">
+        <!-- HEADER / SALDO (Dibuat sisa space seproporsional mungkin) -->
+        <header class="bg-white p-4 pb-5 rounded-b-[2rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0">
             
             <!-- Background Vektor -->
             <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
@@ -39,9 +39,9 @@ import '../styles/global.css';
             </div>
 
             <!-- Top Bar: Profil & Inisial -->
-            <div class="flex justify-between items-center mb-2.5 relative z-10">
+            <div class="flex justify-between items-center mb-3 relative z-10">
                 <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-[10px] text-slate-700 shadow-sm">
+                    <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-sm">
                         ST
                     </div>
                     <div>
@@ -50,13 +50,13 @@ import '../styles/global.css';
                     </div>
                 </div>
                 <div class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                 </div>
             </div>
 
-            <!-- Main Card 3 Kolom: Ringkasan Metrik -->
+            <!-- Main Card 3 Kolom -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-3 rounded-xl shadow-xs relative z-10 space-y-2">
                 
                 <!-- Baris 1: Tiga Metrik Utama -->
@@ -75,7 +75,6 @@ import '../styles/global.css';
                     </div>
                 </div>
 
-                <!-- Divider Tipis -->
                 <div class="border-t border-slate-200/60"></div>
 
                 <!-- Baris 2: Mini Cards In / Out -->
@@ -93,81 +92,81 @@ import '../styles/global.css';
             </div>
         </header>
 
-        <!-- KONTEN UTAMA: TRANSAKSI TERBARU (Kunci 1 Screen tanpa Overflow) -->
-        <main class="flex-1 px-3.5 py-2 space-y-2 overflow-hidden flex flex-col justify-evenly">
-            <div class="flex justify-between items-center my-0.5">
-                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
-                <span class="text-[10px] text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</span>
+        <!-- KONTEN UTAMA: TRANSAKSI TERBARU (Desain Awal Dipertahankan Utuh) -->
+        <main class="flex-1 overflow-hidden p-4 space-y-3 pb-20 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-1">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
+                <span class="text-xs text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</span>
             </div>
 
-            <!-- Item Transaksi 1 -->
-            <div class="bg-white p-2.5 rounded-xl shadow-2xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+            <!-- Item Transaksi: Masuk (In) -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
                         +
                     </div>
                     <div>
-                        <p class="text-xs font-semibold text-slate-800 leading-tight">Dagangan</p>
-                        <p class="text-[10px] text-slate-400">16 August • Usaha</p>
+                        <p class="text-sm font-semibold text-slate-800">Dagangan</p>
+                        <p class="text-xs text-slate-400">16 August • Usaha</p>
                     </div>
                 </div>
-                <span class="text-xs font-bold text-emerald-600">+ Rp 65,000</span>
+                <span class="text-sm font-bold text-emerald-600">+ Rp 65,000</span>
             </div>
 
-            <!-- Item Transaksi 2 -->
-            <div class="bg-white p-2.5 rounded-xl shadow-2xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm">
+            <!-- Item Transaksi: Keluar (Out) -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
                         -
                     </div>
                     <div>
-                        <p class="text-xs font-semibold text-slate-800 leading-tight">Kosan Agust</p>
-                        <p class="text-[10px] text-slate-400">15 August • Prediksi</p>
+                        <p class="text-sm font-semibold text-slate-800">Kosan Agust</p>
+                        <p class="text-xs text-slate-400">15 August • Prediksi</p>
                     </div>
                 </div>
-                <span class="text-xs font-bold text-rose-600">- Rp 500,000</span>
+                <span class="text-sm font-bold text-rose-600">- Rp 500,000</span>
             </div>
 
-            <!-- Item Transaksi 3 -->
-            <div class="bg-white p-2.5 rounded-xl shadow-2xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+            <!-- Item Transaksi: Masuk (In) -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
                         +
                     </div>
                     <div>
-                        <p class="text-xs font-semibold text-slate-800 leading-tight">Insentif Ibu</p>
-                        <p class="text-[10px] text-slate-400">13 August • Lainnya</p>
+                        <p class="text-sm font-semibold text-slate-800">Insentif Ibu</p>
+                        <p class="text-xs text-slate-400">13 August • Lainnya</p>
                     </div>
                 </div>
-                <span class="text-xs font-bold text-emerald-600">+ Rp 400,000</span>
+                <span class="text-sm font-bold text-emerald-600">+ Rp 400,000</span>
             </div>
 
-            <!-- Item Transaksi 4 -->
-            <div class="bg-white p-2.5 rounded-xl shadow-2xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-sm">
+            <!-- Item Transaksi: Keluar (Out) -->
+            <div class="bg-white p-3.5 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
                         -
                     </div>
                     <div>
-                        <p class="text-xs font-semibold text-slate-800 leading-tight">Ambu</p>
-                        <p class="text-[10px] text-slate-400">12 August • Rutin</p>
+                        <p class="text-sm font-semibold text-slate-800">Ambu</p>
+                        <p class="text-xs text-slate-400">12 August • Rutin</p>
                     </div>
                 </div>
-                <span class="text-xs font-bold text-rose-600">- Rp 200,000</span>
+                <span class="text-sm font-bold text-rose-600">- Rp 200,000</span>
             </div>
         </main>
 
-        <!-- TOMBOL AKSI TERKUNCI DI BAGIAN BAWAH (FIT IN SCREEN) -->
-        <footer class="p-3 bg-slate-50 border-t border-slate-100 flex justify-center items-center space-x-3 flex-shrink-0">
-            <a href="/out" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition transform active:scale-95 no-underline">
-                <span class="text-sm font-bold">-</span>
-                <span class="text-xs font-semibold">Keluar (Out)</span>
+        <!-- FLOATING ACTION BUTTON (Desain Awal Floating Bar) -->
+        <div class="absolute bottom-4 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-20">
+            <a href="/out" class="pointer-events-auto bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-md flex items-center space-x-2 transition transform active:scale-95 no-underline">
+                <span class="text-base font-bold">-</span>
+                <span class="text-xs">Keluar (Out)</span>
             </a>
-            <a href="/in" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-xl shadow-xs flex items-center justify-center space-x-1.5 transition transform active:scale-95 no-underline">
-                <span class="text-sm font-bold">+</span>
-                <span class="text-xs font-semibold">Masuk (In)</span>
+            <a href="/in" class="pointer-events-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-md flex items-center space-x-2 transition transform active:scale-95 no-underline">
+                <span class="text-base font-bold">+</span>
+                <span class="text-xs">Masuk (In)</span>
             </a>
-        </footer>
+        </div>
 
     </div>
 
