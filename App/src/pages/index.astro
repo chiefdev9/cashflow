@@ -1,18 +1,10 @@
 ---
 /* 
    FILE: index.astro
-   DESKRIPSI: Dashboard Mobile-First Cashflow dengan Integrasi Supabase Realtime.
-   MAINTENANCE NOTE: 
-   - Ubah konstanta TARGET_BULAN di blok skrip bawah jika ingin memantau bulan lain.
-   - Pastikan ID elemen DOM (seperti val-perputaran, val-sisa-bulanan, dll) tidak diubah 
-     agar fungsi update JavaScript dapat berjalan sinkron.
-
-     Batas pertama sebelum project ini digarap pakai vscode on github
+   DESKRIPSI: Dashboard Mobile-First Cashflow (Layout Transaksi Rapat & Margin Bawah Lega).
 */
 
-// Import komponen Image bawaan Astro
 import { Image } from 'astro:assets';
-// Import stylesheet global Tailwind CSS
 import '../styles/global.css';
 ---
 
@@ -20,24 +12,23 @@ import '../styles/global.css';
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cashflow Mobile-First</title>
-    <!-- Google Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-screen p-0 sm:p-4">
+<body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Khusus Tampilan Mobile (Frame Preview) -->
-    <div class="w-full sm:max-w-md h-screen sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
+    <!-- Container Utama: Menyesuaikan Tinggi Viewport HP (h-dvh) -->
+    <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
-        <!-- HEADER / SALDO LIGHT MODE DENGAN GAMBAR VEKTOR (ZOOM OUT) -->
-        <header class="bg-white p-5 pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden">
+        <!-- HEADER / SALDO -->
+        <header class="bg-white p-4 pb-5 rounded-b-[2rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0">
             
-            <!-- Background Vektor Preview menggunakan Astro <Image> dari folder public -->
-            <div class="absolute inset-0 opacity-40 pointer-events-none overflow-hidden flex items-center justify-center">
+            <!-- Background Vektor -->
+            <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
                 <Image
                     src="/bg.jpg"
                     alt="Aksen Vektor Header"
@@ -48,56 +39,52 @@ import '../styles/global.css';
             </div>
 
             <!-- Top Bar: Profil & Inisial -->
-            <div class="flex justify-between items-center mb-4 relative z-10">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-sm">
+            <div class="flex justify-between items-center mb-3 relative z-10">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-sm">
                         ST
                     </div>
                     <div>
-                        <p class="text-[11px] text-slate-500 font-medium">Cashflow Tanaejka</p>
-                        <h2 class="text-sm font-bold text-slate-800">Agustus 2026</h2>
+                        <p class="text-[10px] text-slate-500 font-medium leading-none">Cashflow Tanaejka</p>
+                        <h2 class="text-xs font-bold text-slate-800 mt-0.5">Agustus 2026</h2>
                     </div>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-sm">
+                <div class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                 </div>
             </div>
 
-            <!-- Main Card 3 Kolom: Perputaran, Sisa Bulanan, Saldo Akhir -->
-            <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-4 rounded-2xl shadow-sm relative z-10 space-y-3">
-               
-                <!-- Baris 1: Tiga Metrik Berjajar (Grid 3 Kolom) -->
+            <!-- Main Card 3 Kolom -->
+            <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-3 rounded-xl shadow-xs relative z-10 space-y-2">
+                
+                <!-- Baris 1: Tiga Metrik Utama -->
                 <div class="grid grid-cols-3 gap-1">
-                    <!-- 1. Perputaran -->
                     <div>
-                        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Perputaran</span>
-                        <h2 id="val-perputaran" class="text-xs sm:text-sm font-bold text-slate-900 mt-1 tracking-tight">Memuat...</h2>
+                        <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Perputaran</span>
+                        <h2 id="val-perputaran" class="text-xs font-bold text-slate-900 mt-0.5 tracking-tight">Memuat...</h2>
                     </div>
-                    <!-- 2. Sisa Bulanan (Tengah) -->
                     <div class="text-center px-1 border-x border-slate-200/60">
-                        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Sisa Bulanan</span>
-                        <h2 id="val-sisa-bulanan" class="text-xs sm:text-sm font-bold text-indigo-600 mt-1 tracking-tight">Memuat...</h2>
+                        <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Sisa Bulanan</span>
+                        <h2 id="val-sisa-bulanan" class="text-xs font-bold text-indigo-600 mt-0.5 tracking-tight">Memuat...</h2>
                     </div>
-                    <!-- 3. Saldo Akhir (Paling Kanan) -->
                     <div class="text-right pl-1">
-                        <span class="text-[9px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Saldo Akhir</span>
-                        <h2 id="val-sisa-akhir" class="text-xs sm:text-sm font-bold text-emerald-700 mt-1 tracking-tight">Memuat...</h2>
+                        <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Saldo Akhir</span>
+                        <h2 id="val-sisa-akhir" class="text-xs font-bold text-emerald-700 mt-0.5 tracking-tight">Memuat...</h2>
                     </div>
                 </div>
 
-                <!-- Divider Tipis -->
                 <div class="border-t border-slate-200/60"></div>
 
-                <!-- Baris 2: Mini Cards In / Out Bulan Berjalan -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/60 shadow-xs">
-                        <p class="text-[10px] text-slate-400 font-medium">Pemasukan (In)</p>
+                <!-- Baris 2: Mini Cards In / Out -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
+                        <p class="text-[9px] text-slate-400 font-medium leading-none">Pemasukan (In)</p>
                         <p id="val-pemasukan" class="text-xs font-bold text-emerald-600 mt-0.5">Memuat...</p>
                     </div>
-                    <div class="bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/60 shadow-xs">
-                        <p class="text-[10px] text-slate-400 font-medium">Pengeluaran (Out)</p>
+                    <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
+                        <p class="text-[9px] text-slate-400 font-medium leading-none">Pengeluaran (Out)</p>
                         <p id="val-pengeluaran" class="text-xs font-bold text-rose-600 mt-0.5">Memuat...</p>
                     </div>
                 </div>
@@ -105,79 +92,77 @@ import '../styles/global.css';
             </div>
         </header>
 
-        <!-- KONTEN UTAMA (FEED / DAFTAR TRANSAKSI TERAKHIR - TETAP UTUH) -->
-        <main class="flex-1 overflow-y-auto p-4 space-y-3 pb-24">
+        <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
+        <main class="flex-1 overflow-y-auto p-4 pb-24 flex flex-col justify-start space-y-2">
             <div class="flex justify-between items-center mb-1">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
                 <span class="text-xs text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</span>
             </div>
 
             <!-- Item Transaksi: Masuk (In) -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base">
                         +
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-slate-800">Dagangan</p>
-                        <p class="text-xs text-slate-400">16 August • Usaha</p>
+                        <p class="text-xs font-semibold text-slate-800">Dagangan</p>
+                        <p class="text-[10px] text-slate-400">16 August • Usaha</p>
                     </div>
                 </div>
-                <span class="text-sm font-bold text-emerald-600">+ Rp 65,000</span>
+                <span class="text-xs font-bold text-emerald-600">+ Rp 65,000</span>
             </div>
 
             <!-- Item Transaksi: Keluar (Out) -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-base">
                         -
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-slate-800">Kosan Agust</p>
-                        <p class="text-xs text-slate-400">15 August • Prediksi</p>
+                        <p class="text-xs font-semibold text-slate-800">Kosan Agust</p>
+                        <p class="text-[10px] text-slate-400">15 August • Prediksi</p>
                     </div>
                 </div>
-                <span class="text-sm font-bold text-rose-600">- Rp 500,000</span>
+                <span class="text-xs font-bold text-rose-600">- Rp 500,000</span>
             </div>
 
             <!-- Item Transaksi: Masuk (In) -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base">
                         +
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-slate-800">Insentif Ibu</p>
-                        <p class="text-xs text-slate-400">13 August • Lainnya</p>
+                        <p class="text-xs font-semibold text-slate-800">Insentif Ibu</p>
+                        <p class="text-[10px] text-slate-400">13 August • Lainnya</p>
                     </div>
                 </div>
-                <span class="text-sm font-bold text-emerald-600">+ Rp 400,000</span>
+                <span class="text-xs font-bold text-emerald-600">+ Rp 400,000</span>
             </div>
 
             <!-- Item Transaksi: Keluar (Out) -->
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
+            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg">
+                    <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-base">
                         -
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-slate-800">Ambu</p>
-                        <p class="text-xs text-slate-400">12 August • Rutin</p>
+                        <p class="text-xs font-semibold text-slate-800">Ambu</p>
+                        <p class="text-[10px] text-slate-400">12 August • Rutin</p>
                     </div>
                 </div>
-                <span class="text-sm font-bold text-rose-600">- Rp 200,000</span>
+                <span class="text-xs font-bold text-rose-600">- Rp 200,000</span>
             </div>
         </main>
 
-        <!-- FLOATING ACTION BUTTON (MENGARAH KE /out DAN /in) -->
-        <div class="absolute bottom-4 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none">
-            <!-- Tombol Tambah Out (Mengarah ke /out) -->
-            <a href="/out" class="pointer-events-auto bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition transform active:scale-95 no-underline">
+        <!-- FLOATING ACTION BUTTON -->
+        <div class="absolute bottom-4 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-20">
+            <a href="/out" class="pointer-events-auto bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-md flex items-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">-</span>
                 <span class="text-xs">Keluar (Out)</span>
             </a>
-            <!-- Tombol Tambah In (Mengarah ke /in) -->
-            <a href="/in" class="pointer-events-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-sm flex items-center space-x-2 transition transform active:scale-95 no-underline">
+            <a href="/in" class="pointer-events-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-md flex items-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">+</span>
                 <span class="text-xs">Masuk (In)</span>
             </a>
@@ -189,21 +174,12 @@ import '../styles/global.css';
     <script>
         import { createClient } from '@supabase/supabase-js';
 
-        // ==========================================
-        // 1. KONFIGURASI KLIEN SUPABASE
-        // ==========================================
         const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
-       
+        
         const supabase = createClient(supabaseUrl, supabaseKey);
-
-        // Target bulan yang sedang aktif ditampilkan di dashboard
         const TARGET_BULAN = 'Agust';
 
-        // ==========================================
-        // 2. FUNGSI UTILITAS: FORMAT RUPIAH
-        // ==========================================
-        // Mengubah angka mentah menjadi format mata uang Rupiah (contoh: Rp 1.500.000)
         function formatRupiah(angka: number | null | undefined): string {
             if (angka === null || angka === undefined) return 'Rp 0';
             const strAngka = angka.toString();
@@ -213,10 +189,6 @@ import '../styles/global.css';
             return 'Rp ' + ribuan;
         }
 
-        // ==========================================
-        // 3. FUNGSI UTAMA: AMBIL DATA DARI SUPABASE
-        // ==========================================
-        // Mengambil data ringkasan baris bulan aktif lalu memperbarui elemen UI secara dinamis.
         async function fetchSummary() {
             const { data, error } = await supabase
                 .from('summary')
@@ -230,11 +202,9 @@ import '../styles/global.css';
             }
 
             if (data) {
-                // --- PERPUTARAN ---
                 const elPerputaran = document.getElementById('val-perputaran');
                 if (elPerputaran) elPerputaran.innerText = formatRupiah(data.Perputaran);
-               
-                // --- SISA BULANAN (Hijau jika >= 0, Merah jika < 0) ---
+                
                 const sisaBulananEl = document.getElementById('val-sisa-bulanan');
                 let sisaBulananVal = Number(data.Sisa_Bulanan) || 0;
                 if (sisaBulananEl) {
@@ -248,7 +218,6 @@ import '../styles/global.css';
                     }
                 }
 
-                // --- SALDO AKHIR (Hijau jika >= 0, Merah jika < 0) ---
                 const elSisaAkhir = document.getElementById('val-sisa-akhir');
                 let sisaAkhirVal = Number(data.Sisa_Akhir) || 0;
                 if (elSisaAkhir) {
@@ -262,35 +231,20 @@ import '../styles/global.css';
                     }
                 }
 
-                // --- PEMASUKAN (IN) ---
                 const elPemasukan = document.getElementById('val-pemasukan');
                 if (elPemasukan) elPemasukan.innerText = formatRupiah(data.Pemasukan);
 
-                // --- PENGELUARAN (OUT) ---
                 const elPengeluaran = document.getElementById('val-pengeluaran');
                 if (elPengeluaran) elPengeluaran.innerText = formatRupiah(data.Pengeluaran);
             }
         }
 
-        // ==========================================
-        // 4. INISIALISASI SAAT HALAMAN DIMUAT
-        // ==========================================
         fetchSummary();
 
-        // ==========================================
-        // 5. REALTIME LISTENER SUPABASE
-        // ==========================================
-        // Begitu GAS mengirim data baru dari Sheet/App ke Supabase, 
-        // listener ini langsung menangkapnya dan menyegarkan tampilan tanpa reload halaman.
         supabase
             .channel('public:summary')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
-                console.log('Perubahan terdeteksi secara realtime:', payload);
-                
-                // Gunakan type casting (as { Bulan?: string }) untuk menghindari error TypeScript pada payload.new
                 const newData = payload.new as { Bulan?: string };
-
-                // Ambil data terbaru jika baris yang berubah mencakup bulan aktif kita
                 if (!newData || newData.Bulan === TARGET_BULAN || payload.eventType === 'DELETE') {
                     fetchSummary();
                 }
