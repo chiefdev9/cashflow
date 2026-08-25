@@ -1,7 +1,7 @@
----
+--- 
 /* 
    FILE: in.astro
-   DESKRIPSI: Form Tambah Pemasukan (Tombol Simpan Terkunci & Presisi).
+   DESKRIPSI: Form Tambah Pemasukan (Positioning Presisi & Konsisten dengan Index).
 */
 
 import { Image } from 'astro:assets';
@@ -125,8 +125,8 @@ import '../styles/global.css';
             </form>
         </main>
 
-        <!-- Tombol Simpan (Fixed & Safe Area Mobile) -->
-        <div class="fixed bottom-0 left-0 right-0 sm:max-w-md sm:mx-auto px-4 pb-4 pt-2 pointer-events-none z-30 mb-[env(safe-area-inset-bottom,0px)]">
+        <!-- Tombol Simpan (Ubah dari 'fixed' menjadi 'absolute' agar posisi konsisten) -->
+        <div class="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-2 pointer-events-none z-30">
             <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
