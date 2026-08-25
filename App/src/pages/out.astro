@@ -1,4 +1,9 @@
 ---
+/* 
+   FILE: out.astro
+   DESKRIPSI: Form Tambah Pengeluaran (Tombol Simpan Terkunci & Presisi).
+*/
+
 import { Image } from 'astro:assets';
 import '../styles/global.css';
 ---
@@ -51,7 +56,7 @@ import '../styles/global.css';
         </header>
 
         <!-- Main Form Content -->
-        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-20">
+        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-28">
             <form id="formOut" class="space-y-3 sm:space-y-4">
                 
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
@@ -87,10 +92,10 @@ import '../styles/global.css';
                             Kategori
                         </label>
                         <select id="kategori" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
-                            <option>Kebutuhan Pokok</option>
-                            <option>Transportasi</option>
-                            <option>Hiburan</option>
-                            <option>Lainnya</option>
+                            <option value="Kebutuhan Pokok">Kebutuhan Pokok</option>
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Hiburan">Hiburan</option>
+                            <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>
 
@@ -120,9 +125,9 @@ import '../styles/global.css';
             </form>
         </main>
 
-        <!-- Tombol Bawah Melayang Pas 1 Layar -->
-        <div class="absolute bottom-3 left-0 right-0 px-4 z-20">
-            <button id="btnSimpan" type="button" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-md text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+        <!-- Tombol Simpan (Fixed & Safe Area Mobile) -->
+        <div class="fixed bottom-0 left-0 right-0 sm:max-w-md sm:mx-auto px-4 pb-4 pt-2 pointer-events-none z-30 mb-[env(safe-area-inset-bottom,0px)]">
+            <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
@@ -179,7 +184,7 @@ import '../styles/global.css';
             }
 
             const formBody = new URLSearchParams({
-                jenis: 'Out', // <-- Penanda satpam agar masuk ke lembar kerja Out
+                jenis: 'Out',
                 angka: rawNominal,
                 sumber: sumberEl ? sumberEl.value : '',
                 kategori: kategoriEl ? kategoriEl.value : '',
