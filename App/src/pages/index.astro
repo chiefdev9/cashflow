@@ -94,71 +94,20 @@ import '../styles/global.css';
             </div>
         </header>
 
-        <!-- KONTEN UTAMA: TRANSAKSI TERBARU (Disetarakan pb-48) -->
+        <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
         <main class="flex-1 overflow-y-auto p-4 pb-48 flex flex-col justify-start space-y-2">
             <div class="flex justify-between items-center mb-1">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
                 <span class="text-xs text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</span>
             </div>
 
-            <!-- Item Transaksi: Masuk (In) -->
-            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base">
-                        +
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-800">Dagangan</p>
-                        <p class="text-[10px] text-slate-400">16 August • Usaha</p>
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-emerald-600">+ Rp 65,000</span>
-            </div>
-
-            <!-- Item Transaksi: Keluar (Out) -->
-            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-base">
-                        -
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-800">Kosan Agust</p>
-                        <p class="text-[10px] text-slate-400">15 August • Prediksi</p>
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-rose-600">- Rp 500,000</span>
-            </div>
-
-            <!-- Item Transaksi: Masuk (In) -->
-            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-base">
-                        +
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-800">Insentif Ibu</p>
-                        <p class="text-[10px] text-slate-400">13 August • Lainnya</p>
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-emerald-600">+ Rp 400,000</span>
-            </div>
-
-            <!-- Item Transaksi: Keluar (Out) -->
-            <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-base">
-                        -
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-slate-800">Ambu</p>
-                        <p class="text-[10px] text-slate-400">12 August • Rutin</p>
-                    </div>
-                </div>
-                <span class="text-xs font-bold text-rose-600">- Rp 200,000</span>
+            <!-- Container Dinamis Transaksi -->
+            <div id="list-transaksi" class="space-y-2">
+                <p class="text-xs text-slate-400 text-center py-4">Memuat transaksi...</p>
             </div>
         </main>
 
-        <!-- FLOATING ACTION BUTTON (Disertakan bottom-28 agar sejajar sempurna) -->
+        <!-- FLOATING ACTION BUTTON -->
         <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
             <a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">-</span>
@@ -241,8 +190,55 @@ import '../styles/global.css';
             }
         }
 
-        fetchSummary();
+        async function fetchTransactions() {
+            const container = document.getElementById('list-transaksi');
+            if (!container) return;
 
+            const { data, error } = await supabase
+                .from('transaksi')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(4);
+
+            if (error) {
+                console.error('Gagal memuat transaksi:', error);
+                container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Gagal memuat transaksi</p>`;
+                return;
+            }
+
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(item => {
+                    const isIn = item.jenis === 'In';
+                    const sign = isIn ? '+' : '-';
+                    const bgClass = isIn ? 'bg-emerald-50' : 'bg-rose-50';
+                    const textClass = isIn ? 'text-emerald-600' : 'text-rose-600';
+                    const nominal = `${sign} ${formatRupiah(item.angka)}`;
+
+                    return `
+                        <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-xl ${bgClass} ${textClass} flex items-center justify-center font-bold text-base">
+                                    ${sign}
+                                </div>
+                                <div>
+                                    <p class="text-xs font-semibold text-slate-800">${item.sumber || '-'}</p>
+                                    <p class="text-[10px] text-slate-400">${item.waktu || ''} • ${item.kategori || '-'}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold ${textClass}">${nominal}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada transaksi</p>`;
+            }
+        }
+
+        // Jalankan fetch awal
+        fetchSummary();
+        fetchTransactions();
+
+        // Subscription Realtime Summary
         supabase
             .channel('public:summary')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
@@ -250,6 +246,14 @@ import '../styles/global.css';
                 if (!newData || newData.Bulan === TARGET_BULAN || payload.eventType === 'DELETE') {
                     fetchSummary();
                 }
+            })
+            .subscribe();
+
+        // Subscription Realtime Transaksi
+        supabase
+            .channel('public:transaksi')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
+                fetchTransactions();
             })
             .subscribe();
     </script>
