@@ -1,7 +1,7 @@
 --- 
 /* 
    FILE: out.astro
-   DESKRIPSI: Form Tambah Pengeluaran (Langsung Simpan ke Supabase & Redirect ke Index).
+   DESKRIPSI: Form Tambah Pengeluaran (Simpan ke Supabase & Update Tabel Summary).
 */
 
 import { Image } from 'astro:assets';
@@ -22,7 +22,7 @@ import '../styles/global.css';
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Frame HP konsisten dengan h-dvh -->
+    <!-- Container Utama: Frame HP -->
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
         <!-- Header -->
@@ -47,6 +47,7 @@ import '../styles/global.css';
                 <div class="w-9"></div>
             </div>
 
+            <!-- Switch In / Out -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
                 <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
                     Pemasukan (In)
@@ -128,7 +129,7 @@ import '../styles/global.css';
             </form>
         </main>
 
-        <!-- Tombol Simpan -->
+        <!-- Tombol Simpan Pengeluaran -->
         <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
             <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,6 +148,7 @@ import '../styles/global.css';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
+        const TARGET_BULAN = 'Agust';
 
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
@@ -160,15 +162,11 @@ import '../styles/global.css';
             waktuEl.value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // Format angka koma otomatis pada input nominal
+        // Format angka ribuan dengan koma
         nominalEl?.addEventListener('input', (e) => {
             const input = e.target as HTMLInputElement;
             let value = input.value.replace(/\D/g, '');
-            
-            if (value) {
-                value = Number(value).toLocaleString('en-US');
-            }
-            
+            if (value) value = Number(value).toLocaleString('en-US');
             input.value = value;
         });
 
@@ -178,8 +176,8 @@ import '../styles/global.css';
         btn?.addEventListener('click', async () => {
             if (!btn) return;
 
-            const rawNominal = nominalEl ? nominalEl.value.replace(/,/g, '') : '';
-            if (!rawNominal || Number(rawNominal) <= 0) {
+            const rawNominal = nominalEl ? Number(nominalEl.value.replace(/,/g, '')) : 0;
+            if (!rawNominal || rawNominal <= 0) {
                 alert('Silakan masukkan nominal transaksi yang valid.');
                 return;
             }
@@ -191,28 +189,62 @@ import '../styles/global.css';
             const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
-            // Memasukkan data langsung ke Supabase dengan jenis 'Out'
-            const { data, error } = await supabase
-                .from('transaksi')
-                .insert([
-                    {
+            try {
+                // 1. Insert ke tabel 'transaksi' (Pengeluaran)
+                const { error: errorInsert } = await supabase
+                    .from('transaksi')
+                    .insert([{
                         jenis: 'Out',
-                        angka: Number(rawNominal),
+                        angka: rawNominal,
                         sumber: sumberEl ? sumberEl.value : 'Rutin',
                         kategori: kategoriEl ? kategoriEl.value : 'Kebutuhan Pokok',
                         waktu: waktuEl ? waktuEl.value : new Date().toISOString(),
                         catatan: catatanEl ? catatanEl.value : ''
-                    }
-                ]);
+                    }]);
 
-            if (error) {
-                console.error('Gagal menyimpan transaksi:', error);
-                alert('Terjadi kesalahan saat menyimpan transaksi.');
+                if (errorInsert) throw errorInsert;
+
+                // 2. Fetch data terkini dari tabel 'summary'
+                const { data: summaryCurrent, error: errorSummary } = await supabase
+                    .from('summary')
+                    .select('*')
+                    .eq('Bulan', TARGET_BULAN)
+                    .single();
+
+                if (errorSummary) throw errorSummary;
+
+                // 3. Kalkulasi matematis Pengeluaran baru
+                const pemasukanLama = Number(summaryCurrent.Pemasukan) || 0;
+                const pengeluaranLama = Number(summaryCurrent.Pengeluaran) || 0;
+                const perputaranLama = Number(summaryCurrent.Perputaran) || 0;
+                const sisaAkhirLama = Number(summaryCurrent.Sisa_Akhir) || 0;
+
+                const pengeluaranBaru = pengeluaranLama + rawNominal;
+                const perputaranBaru = perputaranLama + rawNominal;
+                const sisaBulananBaru = pemasukanLama - pengeluaranBaru;
+                const sisaAkhirBaru = sisaAkhirLama - rawNominal;
+
+                // 4. Update tabel 'summary'
+                const { error: errorUpdate } = await supabase
+                    .from('summary')
+                    .update({
+                        Pengeluaran: pengeluaranBaru,
+                        Perputaran: perputaranBaru,
+                        Sisa_Bulanan: sisaBulananBaru,
+                        Sisa_Akhir: sisaAkhirBaru
+                    })
+                    .eq('Bulan', TARGET_BULAN);
+
+                if (errorUpdate) throw errorUpdate;
+
+                // 5. Kembali ke Dashboard
+                window.location.href = '/';
+
+            } catch (error) {
+                console.error('Gagal menyimpan pengeluaran:', error);
+                alert('Terjadi kesalahan saat menyimpan data.');
                 if (btnText) btnText.innerText = 'Simpan Pengeluaran';
                 btn.disabled = false;
-            } else {
-                // Berhasil: Langsung kembali ke Dashboard
-                window.location.href = '/';
             }
         });
     </script>
