@@ -1,7 +1,7 @@
----
+--- 
 /* 
    FILE: out.astro
-   DESKRIPSI: Form Tambah Pengeluaran (Presisi PWA & Konsisten dengan Index).
+   DESKRIPSI: Form Tambah Pengeluaran (Langsung Simpan ke Supabase & Redirect ke Index).
 */
 
 import { Image } from 'astro:assets';
@@ -74,6 +74,7 @@ import '../styles/global.css';
                             pattern="[0-9]*"
                             placeholder="0" 
                             class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300"
+                            required
                         />
                     </div>
                 </div>
@@ -127,7 +128,7 @@ import '../styles/global.css';
             </form>
         </main>
 
-        <!-- Tombol Simpan (Ketinggian Sejajar dengan FAB Index) -->
+        <!-- Tombol Simpan -->
         <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
             <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,11 +141,17 @@ import '../styles/global.css';
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwYcQfOxkX5tILNy-VjNBx0bRVdCkpiTNvEoTtJpakX_9sU9m10NC5IiePonxTlkbk4-w/exec';
+        import { createClient } from '@supabase/supabase-js';
+
+        const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
+        
+        const supabase = createClient(supabaseUrl, supabaseKey);
 
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
+        // Set default nilai tanggal hari ini (YYYY-MM-DD)
         if (waktuEl) {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -153,6 +160,7 @@ import '../styles/global.css';
             waktuEl.value = `${yyyy}-${mm}-${dd}`;
         }
 
+        // Format angka koma otomatis pada input nominal
         nominalEl?.addEventListener('input', (e) => {
             const input = e.target as HTMLInputElement;
             let value = input.value.replace(/\D/g, '');
@@ -169,7 +177,13 @@ import '../styles/global.css';
 
         btn?.addEventListener('click', async () => {
             if (!btn) return;
-            
+
+            const rawNominal = nominalEl ? nominalEl.value.replace(/,/g, '') : '';
+            if (!rawNominal || Number(rawNominal) <= 0) {
+                alert('Silakan masukkan nominal transaksi yang valid.');
+                return;
+            }
+
             if (btnText) btnText.innerText = 'Menyimpan...';
             btn.disabled = true;
 
@@ -177,41 +191,28 @@ import '../styles/global.css';
             const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
-            const rawNominal = nominalEl ? nominalEl.value.replace(/,/g, '') : '';
+            // Memasukkan data langsung ke Supabase dengan jenis 'Out'
+            const { data, error } = await supabase
+                .from('transaksi')
+                .insert([
+                    {
+                        jenis: 'Out',
+                        angka: Number(rawNominal),
+                        sumber: sumberEl ? sumberEl.value : 'Rutin',
+                        kategori: kategoriEl ? kategoriEl.value : 'Kebutuhan Pokok',
+                        waktu: waktuEl ? waktuEl.value : new Date().toISOString(),
+                        catatan: catatanEl ? catatanEl.value : ''
+                    }
+                ]);
 
-            let formattedDate = '';
-            if (waktuEl && waktuEl.value) {
-                const [y, m, d] = waktuEl.value.split('-');
-                formattedDate = `${parseInt(m)}/${parseInt(d)}/${y}`;
-            }
-
-            const formBody = new URLSearchParams({
-                jenis: 'Out',
-                angka: rawNominal,
-                sumber: sumberEl ? sumberEl.value : '',
-                kategori: kategoriEl ? kategoriEl.value : '',
-                waktu: formattedDate,
-                catatan: catatanEl ? catatanEl.value : ''
-            });
-
-            try {
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: formBody.toString()
-                });
-                
-                alert('Pengeluaran berhasil disimpan!');
-                window.location.reload();
-
-            } catch (error) {
-                alert('Terjadi kesalahan koneksi.');
-                console.error('Error!', error);
+            if (error) {
+                console.error('Gagal menyimpan transaksi:', error);
+                alert('Terjadi kesalahan saat menyimpan transaksi.');
                 if (btnText) btnText.innerText = 'Simpan Pengeluaran';
                 btn.disabled = false;
+            } else {
+                // Berhasil: Langsung kembali ke Dashboard
+                window.location.href = '/';
             }
         });
     </script>
