@@ -1,7 +1,7 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Dashboard Mobile-First Cashflow (Posisi Tombol & Structure Synchronized dengan In/Out).
+   DESKRIPSI: Dashboard Mobile-First Cashflow (Format Waktu Tanggal-Bulan & Judul dari Catatan).
 */
 
 import { Image } from 'astro:assets';
@@ -140,6 +140,20 @@ import '../styles/global.css';
             return 'Rp ' + ribuan;
         }
 
+        function formatTanggalBulan(strWaktu: string | null | undefined): string {
+            if (!strWaktu) return '';
+            const date = new Date(strWaktu);
+            
+            if (!isNaN(date.getTime())) {
+                return new Intl.DateTimeFormat('id-ID', {
+                    day: 'numeric',
+                    month: 'long'
+                }).format(date);
+            }
+
+            return strWaktu.split(' ')[0] || strWaktu;
+        }
+
         async function fetchSummary() {
             const { data, error } = await supabase
                 .from('summary')
@@ -213,6 +227,8 @@ import '../styles/global.css';
                     const bgClass = isIn ? 'bg-emerald-50' : 'bg-rose-50';
                     const textClass = isIn ? 'text-emerald-600' : 'text-rose-600';
                     const nominal = `${sign} ${formatRupiah(item.angka)}`;
+                    
+                    const waktuFormatted = formatTanggalBulan(item.waktu || item.created_at);
 
                     return `
                         <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
@@ -221,8 +237,8 @@ import '../styles/global.css';
                                     ${sign}
                                 </div>
                                 <div>
-                                    <p class="text-xs font-semibold text-slate-800">${item.sumber || '-'}</p>
-                                    <p class="text-[10px] text-slate-400">${item.waktu || ''} • ${item.kategori || '-'}</p>
+                                    <p class="text-xs font-semibold text-slate-800">${item.catatan || item.sumber || '-'}</p>
+                                    <p class="text-[10px] text-slate-400">${waktuFormatted}${item.kategori ? ` • ${item.kategori}` : ''}</p>
                                 </div>
                             </div>
                             <span class="text-xs font-bold ${textClass}">${nominal}</span>
