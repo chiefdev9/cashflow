@@ -1,10 +1,9 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Dashboard Mobile-First Cashflow (Navigasi Akurat ke transaksi.astro).
+   DESKRIPSI: Dashboard Mobile-First Cashflow (Posisi Tombol & Structure Synchronized dengan In/Out).
 */
 
-import { ClientRouter } from 'astro:transitions';
 import { Image } from 'astro:assets';
 import '../styles/global.css';
 ---
@@ -17,10 +16,6 @@ import '../styles/global.css';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Cashflow Tanaejka</title>
-    
-    <!-- Client Router untuk Navigasi Instan (SPA feel) -->
-    <ClientRouter />
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -99,7 +94,7 @@ import '../styles/global.css';
             </div>
         </header>
 
-        <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
+        <!-- KONTEN UTAMA: TRANSAKSI TERBARU (Disetarakan pb-48) -->
         <main class="flex-1 overflow-y-auto p-4 pb-48 flex flex-col justify-start space-y-2">
             <div class="flex justify-between items-center mb-1">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
@@ -163,13 +158,13 @@ import '../styles/global.css';
             </div>
         </main>
 
-        <!-- FLOATING ACTION BUTTON (NAVIGASI PRESISI KE /transaksi) -->
+        <!-- FLOATING ACTION BUTTON (Disertakan bottom-28 agar sejajar sempurna) -->
         <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-            <a href="/transaksi?type=out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
+            <a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">-</span>
                 <span class="text-xs">Keluar (Out)</span>
             </a>
-            <a href="/transaksi?type=in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
+            <a href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">+</span>
                 <span class="text-xs">Masuk (In)</span>
             </a>
@@ -177,7 +172,7 @@ import '../styles/global.css';
 
     </div>
 
-    <!-- SCRIPT REALTIME SUPABASE -->
+    <!-- SCRIPT REALTIME SUPABASE & MANAJEMEN DASHBOARD -->
     <script>
         import { createClient } from '@supabase/supabase-js';
 
@@ -246,19 +241,17 @@ import '../styles/global.css';
             }
         }
 
-        document.addEventListener('astro:page-load', () => {
-            fetchSummary();
+        fetchSummary();
 
-            supabase
-                .channel('public:summary')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
-                    const newData = payload.new as { Bulan?: string };
-                    if (!newData || newData.Bulan === TARGET_BULAN || payload.eventType === 'DELETE') {
-                        fetchSummary();
-                    }
-                })
-                .subscribe();
-        });
+        supabase
+            .channel('public:summary')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
+                const newData = payload.new as { Bulan?: string };
+                if (!newData || newData.Bulan === TARGET_BULAN || payload.eventType === 'DELETE') {
+                    fetchSummary();
+                }
+            })
+            .subscribe();
     </script>
 </body>
 </html>
