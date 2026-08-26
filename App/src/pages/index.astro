@@ -1,7 +1,7 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Dashboard Mobile-First Cashflow (Posisi Tombol & Structure Synchronized dengan In/Out).
+   DESKRIPSI: Dashboard Mobile-First Cashflow (Navigasi Akurat ke transaksi.astro).
 */
 
 import { ClientRouter } from 'astro:transitions';
@@ -99,7 +99,7 @@ import '../styles/global.css';
             </div>
         </header>
 
-        <!-- KONTEN UTAMA: TRANSAKSI TERBARU (Disetarakan pb-48) -->
+        <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
         <main class="flex-1 overflow-y-auto p-4 pb-48 flex flex-col justify-start space-y-2">
             <div class="flex justify-between items-center mb-1">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
@@ -163,13 +163,13 @@ import '../styles/global.css';
             </div>
         </main>
 
-        <!-- FLOATING ACTION BUTTON (Disertakan bottom-28 agar sejajar sempurna) -->
+        <!-- FLOATING ACTION BUTTON (NAVIGASI PRESISI KE /transaksi) -->
         <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-            <a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
+            <a href="/transaksi?type=out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">-</span>
                 <span class="text-xs">Keluar (Out)</span>
             </a>
-            <a href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
+            <a href="/transaksi?type=in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
                 <span class="text-base font-bold">+</span>
                 <span class="text-xs">Masuk (In)</span>
             </a>
@@ -177,7 +177,7 @@ import '../styles/global.css';
 
     </div>
 
-    <!-- SCRIPT REALTIME SUPABASE & MANAJEMEN DASHBOARD -->
+    <!-- SCRIPT REALTIME SUPABASE -->
     <script>
         import { createClient } from '@supabase/supabase-js';
 
@@ -246,7 +246,6 @@ import '../styles/global.css';
             }
         }
 
-        // Jalankan fetch & subscription saat halaman dipasang / berpindah
         document.addEventListener('astro:page-load', () => {
             fetchSummary();
 
