@@ -1,7 +1,7 @@
 --- 
 /* 
    FILE: in.astro
-   DESKRIPSI: Form Tambah Pemasukan (Presisi PWA & Konsisten dengan Index).
+   DESKRIPSI: Form Tambah Pemasukan (Fixed Event Listener Duplication)
 */
 
 import { ClientRouter } from 'astro:transitions';
@@ -27,7 +27,7 @@ import '../styles/global.css';
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Frame HP konsisten dengan h-dvh -->
+    <!-- Container Utama -->
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
         <!-- Header -->
@@ -52,6 +52,7 @@ import '../styles/global.css';
                 <div class="w-9"></div>
             </div>
 
+            <!-- TOGGLE SWITCHER -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
                 <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
                     Pemasukan (In)
@@ -132,7 +133,7 @@ import '../styles/global.css';
             </form>
         </main>
 
-        <!-- Tombol Simpan (Ketinggian Sejajar dengan FAB Index) -->
+        <!-- Tombol Simpan -->
         <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
             <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,7 +148,6 @@ import '../styles/global.css';
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwYcQfOxkX5tILNy-VjNBx0bRVdCkpiTNvEoTtJpakX_9sU9m10NC5IiePonxTlkbk4-w/exec';
 
-        // Menggunakan astro:page-load agar event handler diinisialisasi ulang dengan tepat setelah navigasi SPA
         document.addEventListener('astro:page-load', () => {
             const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
             const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
@@ -162,64 +162,71 @@ import '../styles/global.css';
                 waktuEl.value = `${yyyy}-${mm}-${dd}`;
             }
 
-            nominalEl?.addEventListener('input', (e) => {
-                const input = e.target as HTMLInputElement;
-                let value = input.value.replace(/\D/g, '');
-                
-                if (value) {
-                    value = Number(value).toLocaleString('en-US');
-                }
-                
-                input.value = value;
-            });
-
-            btn?.addEventListener('click', async () => {
-                if (!btn) return;
-                
-                if (btnText) btnText.innerText = 'Menyimpan...';
-                btn.disabled = true;
-
-                const sumberEl = document.getElementById('sumber') as HTMLSelectElement | null;
-                const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
-                const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
-
-                const rawNominal = nominalEl ? nominalEl.value.replace(/,/g, '') : '';
-
-                let formattedDate = '';
-                if (waktuEl && waktuEl.value) {
-                    const [y, m, d] = waktuEl.value.split('-');
-                    formattedDate = `${parseInt(m)}/${parseInt(d)}/${y}`;
-                }
-
-                const formBody = new URLSearchParams({
-                    jenis: 'In',
-                    angka: rawNominal,
-                    sumber: sumberEl ? sumberEl.value : '',
-                    kategori: kategoriEl ? kategoriEl.value : '',
-                    waktu: formattedDate,
-                    catatan: catatanEl ? catatanEl.value : ''
+            // Mencegah penumpukan event listener saat input nominal
+            if (nominalEl && !(nominalEl as any)._hasInputListener) {
+                (nominalEl as any)._hasInputListener = true;
+                nominalEl.addEventListener('input', (e) => {
+                    const input = e.target as HTMLInputElement;
+                    let value = input.value.replace(/\D/g, '');
+                    if (value) {
+                        value = Number(value).toLocaleString('en-US');
+                    }
+                    input.value = value;
                 });
+            }
 
-                try {
-                    await fetch(scriptURL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: formBody.toString()
+            // MENCEGAH DUPLIKASI LISTENER PADA TOMBOL SIMPAN
+            if (btn && !(btn as any)._hasClickListener) {
+                (btn as any)._hasClickListener = true;
+
+                btn.addEventListener('click', async () => {
+                    // Kunci tombol agar tidak diklik berkali-kali
+                    if (btn.disabled) return;
+                    btn.disabled = true;
+                    if (btnText) btnText.innerText = 'Menyimpan...';
+
+                    const sumberEl = document.getElementById('sumber') as HTMLSelectElement | null;
+                    const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
+                    const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
+
+                    const rawNominal = nominalEl ? nominalEl.value.replace(/,/g, '') : '';
+
+                    let formattedDate = '';
+                    if (waktuEl && waktuEl.value) {
+                        const [y, m, d] = waktuEl.value.split('-');
+                        formattedDate = `${parseInt(m)}/${parseInt(d)}/${y}`;
+                    }
+
+                    const formBody = new URLSearchParams({
+                        jenis: 'In',
+                        angka: rawNominal,
+                        sumber: sumberEl ? sumberEl.value : '',
+                        kategori: kategoriEl ? kategoriEl.value : '',
+                        waktu: formattedDate,
+                        catatan: catatanEl ? catatanEl.value : ''
                     });
-                    
-                    alert('Pemasukan berhasil disimpan!');
-                    window.location.reload();
 
-                } catch (error) {
-                    alert('Terjadi kesalahan koneksi.');
-                    console.error('Error!', error);
-                    if (btnText) btnText.innerText = 'Simpan Pemasukan';
-                    btn.disabled = false;
-                }
-            });
+                    try {
+                        await fetch(scriptURL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: formBody.toString()
+                        });
+                        
+                        alert('Pemasukan berhasil disimpan!');
+                        window.location.href = '/'; // Navigasi kembali ke dashboard
+
+                    } catch (error) {
+                        alert('Terjadi kesalahan koneksi.');
+                        console.error('Error!', error);
+                        if (btnText) btnText.innerText = 'Simpan Pemasukan';
+                        btn.disabled = false;
+                    }
+                });
+            }
         });
     </script>
 </body>
