@@ -1,7 +1,7 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Dashboard Mobile-First Cashflow dengan Header Tegas & 4 Transaksi Terbaru Supabase.
+   DESKRIPSI: Dashboard Cashflow Tanaejka dengan Header Tegas, 4 Transaksi Terbaru & FAB Minimalis.
 */
 
 import { ClientRouter } from 'astro:transitions';
@@ -28,13 +28,13 @@ import '../styles/global.css';
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Frame HP -->
+    <!-- Frame Mobile / App Container -->
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
-
-        <!-- HEADER / SALDO (Desain Tegas & Jelas) -->
+        
+        <!-- HEADER & CARD RINGKASAN (Desain Tegas & Jelas) -->
         <header class="bg-white p-4 pb-5 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
             
-            <!-- Background Vektor -->
+            <!-- Background Image Accent -->
             <div class="absolute inset-0 opacity-25 pointer-events-none overflow-hidden flex items-center justify-center">
                 <Image 
                     src="/bg.jpg" 
@@ -45,7 +45,7 @@ import '../styles/global.css';
                 />
             </div>
 
-            <!-- Top Bar: Profil & Inisial -->
+            <!-- Profile Info & Bell -->
             <div class="flex justify-between items-center mb-4 relative z-10">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center font-bold text-xs text-slate-700 shadow-xs">
@@ -56,80 +56,92 @@ import '../styles/global.css';
                         <h2 class="text-sm font-extrabold text-slate-900 mt-1">Agustus 2026</h2>
                     </div>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-500 shadow-xs cursor-pointer">
+                <button class="w-9 h-9 rounded-full bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-500 shadow-xs cursor-pointer hover:bg-slate-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
-                </div>
+                </button>
             </div>
 
-            <!-- Main Card 3 Kolom (Teks & Angka Lebih Tegas/Besar) -->
+            <!-- Card Utama Ringkasan Data -->
             <div class="bg-white/95 backdrop-blur-md border border-slate-200/90 p-4 rounded-2xl shadow-sm relative z-10 space-y-3">
                 
-                <!-- Baris 1: Tiga Metrik Utama -->
+                <!-- Row Top Metrics -->
                 <div class="grid grid-cols-3 gap-1 items-center">
                     <div>
                         <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold block truncate">PERPUTARAN</span>
-                        <h2 id="val-perputaran" class="text-sm font-extrabold text-slate-800 mt-1 tracking-tight">Memuat...</h2>
+                        <h2 id="txtPerputaran" class="text-sm font-extrabold text-slate-800 mt-1 tracking-tight">Memuat...</h2>
                     </div>
                     <div class="text-center px-1 border-x border-slate-200/60">
                         <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold block truncate">SISA BULANAN</span>
-                        <h2 id="val-sisa-bulanan" class="text-sm font-extrabold text-indigo-600 mt-1 tracking-tight">Memuat...</h2>
+                        <h2 id="txtSisaBulanan" class="text-sm font-extrabold text-indigo-600 mt-1 tracking-tight">Memuat...</h2>
                     </div>
                     <div class="text-right pl-1">
                         <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold block truncate">SALDO AKHIR</span>
-                        <h2 id="val-sisa-akhir" class="text-sm font-extrabold text-emerald-600 mt-1 tracking-tight">Memuat...</h2>
+                        <h2 id="txtSaldoAkhir" class="text-sm font-extrabold text-emerald-600 mt-1 tracking-tight">Memuat...</h2>
                     </div>
                 </div>
 
                 <div class="border-t border-slate-100"></div>
 
-                <!-- Baris 2: Mini Cards In / Out -->
+                <!-- Row In / Out Metrics -->
                 <div class="grid grid-cols-2 gap-2.5">
                     <div class="bg-slate-50/90 p-2.5 rounded-xl border border-slate-200/60">
                         <p class="text-[10px] text-slate-400 font-semibold leading-none">Pemasukan (In)</p>
-                        <p id="val-pemasukan" class="text-sm font-extrabold text-emerald-600 mt-1">Memuat...</p>
+                        <p id="txtPemasukan" class="text-sm font-extrabold text-emerald-600 mt-1">Memuat...</p>
                     </div>
                     <div class="bg-slate-50/90 p-2.5 rounded-xl border border-slate-200/60">
                         <p class="text-[10px] text-slate-400 font-semibold leading-none">Pengeluaran (Out)</p>
-                        <p id="val-pengeluaran" class="text-sm font-extrabold text-rose-600 mt-1">Memuat...</p>
+                        <p id="txtPengeluaran" class="text-sm font-extrabold text-rose-600 mt-1">Memuat...</p>
                     </div>
                 </div>
 
             </div>
         </header>
 
-        <!-- KONTEN UTAMA: TRANSAKSI TERBARU (DI-LIMIT 4 ITEM) -->
-        <main class="flex-1 overflow-y-auto p-4 pb-48 flex flex-col justify-start space-y-2.5">
-            <div class="flex justify-between items-center mb-1">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
-                <a href="/transaksi" class="text-xs text-indigo-600 font-semibold hover:underline">Lihat Semua</a>
+        <!-- MAIN CONTENT: DUA TAB (RIWAYAT & STATISTIK) -->
+        <main class="flex-1 overflow-y-auto p-4 pb-32">
+            <!-- Pilihan Tab Navigation -->
+            <div class="flex justify-between items-center border-b border-slate-200 mb-4 pb-2">
+                <div class="flex space-x-6 text-xs font-bold">
+                    <button id="tabRiwayat" class="pb-2 border-b-2 border-slate-800 text-slate-800 transition">Riwayat Transaksi</button>
+                    <button id="tabStatistik" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition">Statistik</button>
+                </div>
+                <a href="/transaksi" class="text-[11px] text-indigo-600 font-semibold hover:underline pb-2">Lihat Semua</a>
             </div>
 
-            <!-- Loading Indicator -->
-            <div id="loadingState" class="text-center py-6 text-xs text-slate-400">
-                Memuat 4 transaksi terbaru...
-            </div>
+            <!-- Konten Tab 1: Riwayat Transaksi (Max 4 Items) -->
+            <section id="contentRiwayat" class="space-y-2">
+                <div id="loadingState" class="text-center py-6 text-xs text-slate-400">
+                    Memuat 4 transaksi terbaru...
+                </div>
+                <div id="listTransaksi" class="space-y-2"></div>
+            </section>
 
-            <!-- Container List Transaksi Realtime -->
-            <div id="listTransaksi" class="space-y-2"></div>
+            <!-- Konten Tab 2: Grafik/Statistik -->
+            <section id="contentStatistik" class="hidden">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm text-center">
+                    <p class="text-xs font-semibold text-slate-500">Statistik Bulan Agustus 2026</p>
+                    <div class="h-40 flex items-center justify-center text-slate-300 text-xs">
+                        [Grafik Statistik Supabase]
+                    </div>
+                </div>
+            </section>
         </main>
 
-        <!-- FLOATING ACTION BUTTON -->
-        <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-            <a href="/transaksi?type=out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3.5 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
-                <span class="text-base font-bold">-</span>
-                <span class="text-xs">Keluar (Out)</span>
-            </a>
-            <a href="/transaksi?type=in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
-                <span class="text-base font-bold">+</span>
-                <span class="text-xs">Masuk (In)</span>
+        <!-- FAB (Floating Action Button) Tambah Transaksi -->
+        <div class="absolute bottom-6 left-0 right-0 px-6 flex justify-center z-30 pointer-events-none">
+            <a href="/out" class="pointer-events-auto bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 px-6 rounded-full shadow-xl text-xs sm:text-sm transition transform active:scale-95 flex items-center space-x-2 border border-slate-700 no-underline">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span>Tambah Transaksi</span>
             </a>
         </div>
 
     </div>
 
-    <!-- SCRIPT REALTIME SUPABASE (Summary + Limit 4 Transaksi) -->
+    <!-- SCRIPT REALTIME SUPABASE INTEGRATION -->
     <script>
         import { createClient } from '@supabase/supabase-js';
 
@@ -139,7 +151,7 @@ import '../styles/global.css';
         const supabase = createClient(supabaseUrl, supabaseKey);
         const TARGET_BULAN = 'Agust';
 
-        // Helper Format Currency
+        // Helper Format Rupiah
         function formatRupiah(val: number | null | undefined): string {
             if (val === null || val === undefined) return 'Rp 0';
             const isNegative = val < 0;
@@ -147,7 +159,7 @@ import '../styles/global.css';
             return isNegative ? `-Rp ${formatted}` : `Rp ${formatted}`;
         }
 
-        // 1. Fetch Summary Data
+        // 1. FUNGSI FETCH SUMMARY DARI TABEL 'summary'
         async function fetchSummary() {
             const { data, error } = await supabase
                 .from('summary')
@@ -156,49 +168,37 @@ import '../styles/global.css';
                 .single();
 
             if (error) {
-                console.error('Gagal memuat data ringkasan:', error);
+                console.error('Gagal mengambil data summary:', error);
                 return;
             }
 
             if (data) {
-                const elPerputaran = document.getElementById('val-perputaran');
+                const elPerputaran = document.getElementById('txtPerputaran');
+                const elSisaBulanan = document.getElementById('txtSisaBulanan');
+                const elSaldoAkhir = document.getElementById('txtSaldoAkhir');
+                const elPemasukan = document.getElementById('txtPemasukan');
+                const elPengeluaran = document.getElementById('txtPengeluaran');
+
                 if (elPerputaran) elPerputaran.innerText = formatRupiah(data.Perputaran);
                 
-                const sisaBulananEl = document.getElementById('val-sisa-bulanan');
-                let sisaBulananVal = Number(data.Sisa_Bulanan) || 0;
-                if (sisaBulananEl) {
-                    sisaBulananEl.classList.remove('text-indigo-600', 'text-emerald-600', 'text-rose-600');
-                    if (sisaBulananVal < 0) {
-                        sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
-                        sisaBulananEl.classList.add('text-rose-600');
-                    } else {
-                        sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
-                        sisaBulananEl.classList.add('text-emerald-600');
-                    }
+                if (elSisaBulanan) {
+                    let sisaVal = Number(data.Sisa_Bulanan) || 0;
+                    elSisaBulanan.innerText = formatRupiah(sisaVal);
+                    elSisaBulanan.className = 'text-sm font-extrabold mt-1 tracking-tight ' + (sisaVal < 0 ? 'text-rose-600' : 'text-emerald-600');
                 }
 
-                const elSisaAkhir = document.getElementById('val-sisa-akhir');
-                let sisaAkhirVal = Number(data.Sisa_Akhir) || 0;
-                if (elSisaAkhir) {
-                    elSisaAkhir.classList.remove('text-emerald-600', 'text-rose-600');
-                    if (sisaAkhirVal < 0) {
-                        elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
-                        elSisaAkhir.classList.add('text-rose-600');
-                    } else {
-                        elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
-                        elSisaAkhir.classList.add('text-emerald-600');
-                    }
+                if (elSaldoAkhir) {
+                    let saldoVal = Number(data.Sisa_Akhir) || 0;
+                    elSaldoAkhir.innerText = formatRupiah(saldoVal);
+                    elSaldoAkhir.className = 'text-sm font-extrabold mt-1 tracking-tight ' + (saldoVal < 0 ? 'text-rose-600' : 'text-emerald-600');
                 }
 
-                const elPemasukan = document.getElementById('val-pemasukan');
                 if (elPemasukan) elPemasukan.innerText = formatRupiah(data.Pemasukan);
-
-                const elPengeluaran = document.getElementById('val-pengeluaran');
                 if (elPengeluaran) elPengeluaran.innerText = formatRupiah(data.Pengeluaran);
             }
         }
 
-        // 2. Fetch Max 4 Transactions
+        // 2. FUNGSI FETCH RIWAYAT TRANSAKSI DARI TABEL 'transaksi' (LIMIT 4 ITEM)
         async function fetchTransaksi() {
             const listEl = document.getElementById('listTransaksi');
             const loadingEl = document.getElementById('loadingState');
@@ -207,13 +207,13 @@ import '../styles/global.css';
                 .from('transaksi')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(4); // Dibatasi tepat 4 transaksi paling baru
+                .limit(4); // Dibatasi maksimal 4 transaksi terbaru
 
             if (loadingEl) loadingEl.style.display = 'none';
 
             if (error) {
-                console.error('Gagal mengambil transaksi:', error);
-                if (listEl) listEl.innerHTML = `<p class="text-xs text-center text-rose-500 py-4">Gagal memuat transaksi.</p>`;
+                console.error('Gagal mengambil riwayat transaksi:', error);
+                if (listEl) listEl.innerHTML = `<p class="text-xs text-center text-rose-500 py-4">Gagal memuat riwayat.</p>`;
                 return;
             }
 
@@ -227,21 +227,23 @@ import '../styles/global.css';
                     const isIn = t.jenis === 'In';
                     const amountFormatted = (isIn ? '+ ' : '- ') + formatRupiah(t.angka);
                     const textColor = isIn ? 'text-emerald-600' : 'text-rose-600';
-                    const iconBg = isIn ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
-                    const iconSymbol = isIn ? '+' : '-';
+                    const badgeBg = isIn ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
 
                     return `
-                        <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
+                        <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-xs flex justify-between items-center">
                             <div class="flex items-center space-x-3">
-                                <div class="w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center font-bold text-base">
-                                    ${iconSymbol}
+                                <div class="w-8 h-8 rounded-xl ${badgeBg} flex items-center justify-center font-bold text-xs">
+                                    ${isIn ? 'IN' : 'OUT'}
                                 </div>
                                 <div>
-                                    <p class="text-xs font-semibold text-slate-800">${t.kategori || 'Transaksi'}</p>
-                                    <p class="text-[10px] text-slate-400">${t.catatan || t.sumber || ''}</p>
+                                    <h3 class="text-xs font-bold text-slate-800">${t.kategori || 'Transaksi'}</h3>
+                                    <p class="text-[10px] font-medium text-slate-400">${t.sumber || ''} ${t.catatan ? '• ' + t.catatan : ''}</p>
                                 </div>
                             </div>
-                            <span class="text-xs font-bold ${textColor}">${amountFormatted}</span>
+                            <div class="text-right">
+                                <span class="block text-xs font-bold ${textColor}">${amountFormatted}</span>
+                                <span class="text-[9px] text-slate-400">${t.waktu ? t.waktu.split('T')[0] : ''}</span>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -252,11 +254,32 @@ import '../styles/global.css';
             fetchSummary();
             fetchTransaksi();
 
+            // 3. LISTEN TO SUPABASE REALTIME
             supabase
-                .channel('dashboard-updates')
+                .channel('db-changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, () => fetchSummary())
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => fetchTransaksi())
                 .subscribe();
+
+            // 4. TAB SWITCHING LOGIC
+            const tabRiwayat = document.getElementById('tabRiwayat');
+            const tabStatistik = document.getElementById('tabStatistik');
+            const contentRiwayat = document.getElementById('contentRiwayat');
+            const contentStatistik = document.getElementById('contentStatistik');
+
+            tabRiwayat?.addEventListener('click', () => {
+                contentRiwayat?.classList.remove('hidden');
+                contentStatistik?.classList.add('hidden');
+                tabRiwayat.className = 'pb-2 border-b-2 border-slate-800 text-slate-800 transition';
+                if (tabStatistik) tabStatistik.className = 'pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+            });
+
+            tabStatistik?.addEventListener('click', () => {
+                contentStatistik?.classList.remove('hidden');
+                contentRiwayat?.classList.add('hidden');
+                tabStatistik.className = 'pb-2 border-b-2 border-slate-800 text-slate-800 transition';
+                if (tabRiwayat) tabRiwayat.className = 'pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition';
+            });
         }
 
         document.addEventListener('astro:page-load', () => {
