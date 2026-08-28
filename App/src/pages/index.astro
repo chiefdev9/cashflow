@@ -1,8 +1,7 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Desian terakhir, 4 transaksi UI sudah sesuai terhubung dengan in dan out.
-   query baru yang sesuai dengan alur google sheet
+   DESKRIPSI: Desain terakhir, disesuaikan dengan penulisan nama bulan di tabel summary Supabase (Juli, Juni, Mei, Agust).
 */
 
 import { Image } from 'astro:assets';
@@ -131,24 +130,23 @@ import '../styles/global.css';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Penentuan Bulan Dinamis Berjalan yang Selaras Sepenuhnya dengan Supabase
         const now = new Date();
         const monthIndex = now.getMonth(); 
         const year = now.getFullYear();
 
-        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
+        // NAMA BULAN DISESUAIKAN PERSIS DENGAN TABEL SUMMARY SUPABASE ('Juni', 'Juli', 'Agust')
+        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Juni', 'Juli', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
         const TARGET_BULAN = shortMonths[monthIndex]; 
         const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
 
-        // Set Judul Header UI secara otomatis sesuai bulan berjalan
         const elHeaderBulan = document.getElementById('header-bulan');
         if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
 
         function formatRupiah(angka: number | null | undefined): string {
             if (angka === null || angka === undefined) return 'Rp 0';
-            const strAngka = angka.toString();
+            const strAngka = Math.round(Number(angka)).toString();
             const reverse = strAngka.split('').reverse().join('');
             const matchRibuan = reverse.match(/\d{1,3}/g);
             const ribuan = matchRibuan ? matchRibuan.join('.').split('').reverse().join('') : '';
@@ -257,10 +255,7 @@ import '../styles/global.css';
         supabase
             .channel('public:summary')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
-                const newData = payload.new as { Bulan?: string };
-                if (!newData || newData.Bulan === TARGET_BULAN || payload.eventType === 'DELETE') {
-                    fetchSummary();
-                }
+                fetchSummary();
             })
             .subscribe();
 
@@ -269,6 +264,7 @@ import '../styles/global.css';
             .channel('public:transaksi')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
                 fetchTransactions();
+                fetchSummary(); // Ikut refresh summary saat ada perubahan transaksi
             })
             .subscribe();
     </script>
