@@ -1,7 +1,7 @@
 --- 
 /* 
    FILE: out.astro
-   DESKRIPSI: Form Tambah Pengeluaran (Simpan ke Supabase & Update Tabel Summary).
+   DESKRIPSI: Form Tambah Pengeluaran (Simpan ke Supabase & Update Tabel Summary via Trigger).
 */
 
 import { Image } from 'astro:assets';
@@ -148,7 +148,6 @@ import '../styles/global.css';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
-        const TARGET_BULAN = 'Agust';
 
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
@@ -190,7 +189,8 @@ import '../styles/global.css';
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
             try {
-                // 1. Insert ke tabel 'transaksi' (Pengeluaran)
+                // HANYA LAKUKAN INSERT KE TABEL TRANSAKSI.
+                // Trigger Supabase akan meng-update tabel 'summary' secara otomatis!
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
@@ -204,40 +204,7 @@ import '../styles/global.css';
 
                 if (errorInsert) throw errorInsert;
 
-                // 2. Fetch data terkini dari tabel 'summary'
-                const { data: summaryCurrent, error: errorSummary } = await supabase
-                    .from('summary')
-                    .select('*')
-                    .eq('Bulan', TARGET_BULAN)
-                    .single();
-
-                if (errorSummary) throw errorSummary;
-
-                // 3. Kalkulasi matematis Pengeluaran baru
-                const pemasukanLama = Number(summaryCurrent.Pemasukan) || 0;
-                const pengeluaranLama = Number(summaryCurrent.Pengeluaran) || 0;
-                const perputaranLama = Number(summaryCurrent.Perputaran) || 0;
-                const sisaAkhirLama = Number(summaryCurrent.Sisa_Akhir) || 0;
-
-                const pengeluaranBaru = pengeluaranLama + rawNominal;
-                const perputaranBaru = perputaranLama + rawNominal;
-                const sisaBulananBaru = pemasukanLama - pengeluaranBaru;
-                const sisaAkhirBaru = sisaAkhirLama - rawNominal;
-
-                // 4. Update tabel 'summary'
-                const { error: errorUpdate } = await supabase
-                    .from('summary')
-                    .update({
-                        Pengeluaran: pengeluaranBaru,
-                        Perputaran: perputaranBaru,
-                        Sisa_Bulanan: sisaBulananBaru,
-                        Sisa_Akhir: sisaAkhirBaru
-                    })
-                    .eq('Bulan', TARGET_BULAN);
-
-                if (errorUpdate) throw errorUpdate;
-
-                // 5. Kembali ke Dashboard
+                // Langsung arahkan kembali ke Dashboard
                 window.location.href = '/';
 
             } catch (error) {
