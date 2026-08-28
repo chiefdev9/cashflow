@@ -59,7 +59,7 @@ import '../styles/global.css';
         </header>
 
         <!-- Main Form Content -->
-        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
+        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4">
             <form id="formIn" class="space-y-3 sm:space-y-4">
                 
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
@@ -129,15 +129,15 @@ import '../styles/global.css';
             </form>
         </main>
 
-        <!-- Tombol Simpan Pemasukan -->
-        <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
-            <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+        <!-- FOOTER ACTION BAR (SAMAKAN DENGAN INDEX.ASTRO) -->
+        <footer class="p-4 bg-slate-50 border-t border-slate-100 flex justify-center items-center z-30 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <button id="btnSimpan" type="button" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 <span id="btnText">Simpan Pemasukan</span>
             </button>
-        </div>
+        </footer>
 
     </div>
 
@@ -152,7 +152,6 @@ import '../styles/global.css';
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
-        // Set default nilai tanggal hari ini (YYYY-MM-DD)
         if (waktuEl) {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -161,7 +160,6 @@ import '../styles/global.css';
             waktuEl.value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // Format angka ribuan dengan koma
         nominalEl?.addEventListener('input', (e) => {
             const input = e.target as HTMLInputElement;
             let value = input.value.replace(/\D/g, '');
@@ -189,8 +187,6 @@ import '../styles/global.css';
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
             try {
-                // HANYA INSERT KE TABEL TRANSAKSI.
-                // Database Trigger Supabase akan memperbarui tabel summary secara otomatis.
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
@@ -204,7 +200,6 @@ import '../styles/global.css';
 
                 if (errorInsert) throw errorInsert;
 
-                // Langsung kembali ke Dashboard
                 window.location.href = '/';
 
             } catch (error) {
