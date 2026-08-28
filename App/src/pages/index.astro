@@ -1,7 +1,8 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Desian terakhir, 4 transaksi UI sudah sesuai terhubung dengan in dan out.
+   DESKRIPSI: Desain terakhir, 4 transaksi UI sudah sesuai terhubung dengan in dan out & ter-update otomatis secara realtime.
+   KODE INI SUDAH DAPAT BY PASS DARI SUPABASE TABEL TRANSAKSI
 */
 
 import { Image } from 'astro:assets';
@@ -238,7 +239,7 @@ import '../styles/global.css';
         fetchSummary();
         fetchTransactions();
 
-        // Subscription Realtime Summary
+        // Subscription Realtime Summary (Bila ada perubahan pada tabel summary)
         supabase
             .channel('public:summary')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
@@ -249,11 +250,12 @@ import '../styles/global.css';
             })
             .subscribe();
 
-        // Subscription Realtime Transaksi
+        // Subscription Realtime Transaksi (Memperbarui daftar transaksi DAN summary header sekaligus)
         supabase
             .channel('public:transaksi')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
                 fetchTransactions();
+                fetchSummary();
             })
             .subscribe();
     </script>
