@@ -1,8 +1,8 @@
 --- 
 /* 
    FILE: index.astro
-   DESKRIPSI: Desain terakhir, 4 transaksi UI sudah sesuai terhubung dengan in dan out & ter-update otomatis secara realtime.
-   KODE INI SUDAH DAPAT BY PASS DARI SUPABASE TABEL TRANSAKSI
+   DESKRIPSI: Frontend Astro yang dinamis mengikuti bulan berjalan (Agustus dst)
+   Asumsi ku ini gagal, karena hardcode Agust di hapus
 */
 
 import { Image } from 'astro:assets';
@@ -49,7 +49,8 @@ import '../styles/global.css';
                     </div>
                     <div>
                         <p class="text-[10px] text-slate-500 font-medium leading-none">Cashflow Tanaejka</p>
-                        <h2 class="text-xs font-bold text-slate-800 mt-0.5">Agustus 2026</h2>
+                        <!-- ID ditambahkan agar judul bulan dinamis -->
+                        <h2 id="header-bulan" class="text-xs font-bold text-slate-800 mt-0.5">Memuat...</h2>
                     </div>
                 </div>
                 <div class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm">
@@ -130,7 +131,21 @@ import '../styles/global.css';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
-        const TARGET_BULAN = 'Agust';
+
+        // 1. Dapatkan Kode Bulan Dinamis ('Agust', 'Sept', dst) & Judul Teks
+        const now = new Date();
+        const monthIndex = now.getMonth(); // 0 - 11
+        const year = now.getFullYear();
+
+        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
+        const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        const TARGET_BULAN = shortMonths[monthIndex]; // Digunakan untuk Query database
+        const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`; // Digunakan untuk Header UI
+
+        // Set Judul Bulan di Header UI secara dinamis
+        const elHeaderBulan = document.getElementById('header-bulan');
+        if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
 
         function formatRupiah(angka: number | null | undefined): string {
             if (angka === null || angka === undefined) return 'Rp 0';
@@ -239,7 +254,7 @@ import '../styles/global.css';
         fetchSummary();
         fetchTransactions();
 
-        // Subscription Realtime Summary (Bila ada perubahan pada tabel summary)
+        // Subscription Realtime Summary
         supabase
             .channel('public:summary')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
@@ -250,12 +265,11 @@ import '../styles/global.css';
             })
             .subscribe();
 
-        // Subscription Realtime Transaksi (Memperbarui daftar transaksi DAN summary header sekaligus)
+        // Subscription Realtime Transaksi
         supabase
             .channel('public:transaksi')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
                 fetchTransactions();
-                fetchSummary();
             })
             .subscribe();
     </script>
