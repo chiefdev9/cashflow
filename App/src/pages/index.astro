@@ -1,272 +1,438 @@
 --- 
+
 /* 
-   FILE: index.astro
-   DESKRIPSI: Desain terakhir, disesuaikan dengan penulisan nama bulan di tabel summary Supabase (Juli, Juni, Mei, Agust).
+
+   FILE: in.astro
+
+   DESKRIPSI: Form Tambah Pemasukan (Simpan ke Supabase & Update Tabel Summary via Trigger).
+
 */
 
+
+
 import { Image } from 'astro:assets';
+
 import '../styles/global.css';
+
 ---
 
+
+
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
+
     <link rel="manifest" href="/site.webmanifest" />
 
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cashflow Tanaejka</title>
+
+    <title>Tambah Pemasukan - Cashflow Tanaejka</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+
         body { font-family: 'Inter', sans-serif; }
+
     </style>
+
 </head>
+
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
+
+
     <!-- Container Utama: Frame HP -->
+
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
-        <!-- HEADER / SALDO -->
-        <header class="bg-white p-4 pb-5 rounded-b-[2rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
-            
-            <!-- Background Vektor -->
+
+
+        <!-- Header -->
+
+        <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
+
             <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
-                <Image
-                    src="/bg.jpg"
-                    alt="Aksen Vektor Header"
+
+                <Image 
+
+                    src="/bg.jpg" 
+
+                    alt="Aksen Vektor Header" 
+
                     width={800}
+
                     height={600}
+
                     class="w-full h-full object-cover scale-125 transform"
+
                 />
+
             </div>
 
-            <!-- Top Bar: Profil & Inisial -->
-            <div class="flex justify-between items-center mb-3 relative z-10">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-sm">
-                        ST
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-slate-500 font-medium leading-none">Cashflow Tanaejka</p>
-                        <h2 id="header-bulan" class="text-xs font-bold text-slate-800 mt-0.5">Memuat...</h2>
-                    </div>
-                </div>
-                <div class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm">
+
+
+            <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
+
+                <a href="/" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs">
+
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+
                     </svg>
-                </div>
-            </div>
 
-            <!-- Main Card 3 Kolom -->
-            <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-3 rounded-xl shadow-xs relative z-10 space-y-2">
-                
-                <!-- Baris 1: Tiga Metrik Utama -->
-                <div class="grid grid-cols-3 gap-1">
-                    <div>
-                        <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Perputaran</span>
-                        <h2 id="val-perputaran" class="text-xs font-bold text-slate-900 mt-0.5 tracking-tight">Memuat...</h2>
-                    </div>
-                    <div class="text-center px-1 border-x border-slate-200/60">
-                        <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Sisa Bulanan</span>
-                        <h2 id="val-sisa-bulanan" class="text-xs font-bold text-indigo-600 mt-0.5 tracking-tight">Memuat...</h2>
-                    </div>
-                    <div class="text-right pl-1">
-                        <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Saldo Akhir</span>
-                        <h2 id="val-sisa-akhir" class="text-xs font-bold text-emerald-700 mt-0.5 tracking-tight">Memuat...</h2>
-                    </div>
-                </div>
+                </a>
 
-                <div class="border-t border-slate-200/60"></div>
+                <h2 class="text-sm font-bold text-slate-800">Tambah Transaksi Baru</h2>
 
-                <!-- Baris 2: Mini Cards In / Out -->
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
-                        <p class="text-[9px] text-slate-400 font-medium leading-none">Pemasukan (In)</p>
-                        <p id="val-pemasukan" class="text-xs font-bold text-emerald-600 mt-0.5">Memuat...</p>
-                    </div>
-                    <div class="bg-slate-50/80 p-1.5 rounded-lg border border-slate-200/60">
-                        <p class="text-[9px] text-slate-400 font-medium leading-none">Pengeluaran (Out)</p>
-                        <p id="val-pengeluaran" class="text-xs font-bold text-rose-600 mt-0.5">Memuat...</p>
-                    </div>
-                </div>
+                <div class="w-9"></div>
 
             </div>
+
+
+
+            <!-- Switch In / Out -->
+
+            <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
+
+                <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
+
+                    Pemasukan (In)
+
+                </a>
+
+                <a href="/out" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
+
+                    Pengeluaran (Out)
+
+                </a>
+
+            </div>
+
         </header>
 
-        <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
-        <main class="flex-1 overflow-y-auto p-4 pb-48 flex flex-col justify-start space-y-2">
-            <div class="flex justify-between items-center mb-1">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
-                <a href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit?pli=1&gid=962128336#gid=962128336" class="text-xs text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</a>
-            </div>
 
-            <!-- Container Dinamis Transaksi -->
-            <div id="list-transaksi" class="space-y-2">
-                <p class="text-xs text-slate-400 text-center py-4">Memuat transaksi...</p>
-            </div>
+
+        <!-- Main Form Content -->
+
+        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
+
+            <form id="formIn" class="space-y-3 sm:space-y-4">
+
+                
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+                        Nominal Pemasukan
+
+                    </label>
+
+                    <div class="relative flex items-center">
+
+                        <span class="text-lg font-bold text-slate-400 mr-2">Rp</span>
+
+                        <input 
+
+                            id="nominal"
+
+                            type="text" 
+
+                            inputmode="numeric"
+
+                            pattern="[0-9]*"
+
+                            placeholder="0" 
+
+                            class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300"
+
+                            required
+
+                        />
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+                        Sumber
+
+                    </label>
+
+                    <select id="sumber" class="w-full text-sm font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
+
+                        <option value="Rutin">Rutin</option>
+
+                        <option value="Tentatif">Tentatif</option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+                            Kategori
+
+                        </label>
+
+                        <select id="kategori" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
+
+                            <option value="Usaha">Usaha</option>
+
+                            <option value="Gaji">Gaji</option>
+
+                            <option value="Bonus">Bonus</option>
+
+                            <option value="Lainnya">Lainnya</option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+                            Tanggal
+
+                        </label>
+
+                        <input 
+
+                            id="waktu"
+
+                            type="date" 
+
+                            class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer"
+
+                        />
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+                        Catatan (Opsional)
+
+                    </label>
+
+                    <textarea 
+
+                        id="catatan"
+
+                        rows="2"
+
+                        placeholder="Tambahkan detail catatan jika perlu..." 
+
+                        class="w-full text-xs text-slate-800 focus:outline-none bg-transparent placeholder-slate-300 resize-none font-medium"
+
+                    ></textarea>
+
+                </div>
+
+            </form>
+
         </main>
 
-        <!-- FLOATING ACTION BUTTON -->
-        <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-            <a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
-                <span class="text-base font-bold">-</span>
-                <span class="text-xs">Keluar (Out)</span>
-            </a>
-            <a href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline">
-                <span class="text-base font-bold">+</span>
-                <span class="text-xs">Masuk (In)</span>
-            </a>
+
+
+        <!-- Tombol Simpan Pemasukan -->
+
+        <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
+
+            <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+
+                </svg>
+
+                <span id="btnText">Simpan Pemasukan</span>
+
+            </button>
+
         </div>
+
+
 
     </div>
 
-    <!-- SCRIPT REALTIME SUPABASE & MANAJEMEN DASHBOARD -->
+
+
     <script>
+
         import { createClient } from '@supabase/supabase-js';
 
+
+
         const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
+
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
+
         
+
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        const now = new Date();
-        const monthIndex = now.getMonth(); 
-        const year = now.getFullYear();
 
-        // NAMA BULAN DISESUAIKAN PERSIS DENGAN TABEL SUMMARY SUPABASE ('Juni', 'Juli', 'Agust')
-        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Juni', 'Juli', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
-        const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-        const TARGET_BULAN = shortMonths[monthIndex]; 
-        const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
+        const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
 
-        const elHeaderBulan = document.getElementById('header-bulan');
-        if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
+        const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
-        function formatRupiah(angka: number | null | undefined): string {
-            if (angka === null || angka === undefined) return 'Rp 0';
-            const strAngka = Math.round(Number(angka)).toString();
-            const reverse = strAngka.split('').reverse().join('');
-            const matchRibuan = reverse.match(/\d{1,3}/g);
-            const ribuan = matchRibuan ? matchRibuan.join('.').split('').reverse().join('') : '';
-            return 'Rp ' + ribuan;
+
+
+        // Set default nilai tanggal hari ini (YYYY-MM-DD)
+
+        if (waktuEl) {
+
+            const today = new Date();
+
+            const yyyy = today.getFullYear();
+
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+
+            const dd = String(today.getDate()).padStart(2, '0');
+
+            waktuEl.value = `${yyyy}-${mm}-${dd}`;
+
         }
 
-        async function fetchSummary() {
-            const { data, error } = await supabase
-                .from('summary')
-                .select('*')
-                .eq('Bulan', TARGET_BULAN)
-                .single();
 
-            if (error) {
-                console.error('Gagal memuat data ringkasan:', error);
+
+        // Format angka ribuan dengan koma
+
+        nominalEl?.addEventListener('input', (e) => {
+
+            const input = e.target as HTMLInputElement;
+
+            let value = input.value.replace(/\D/g, '');
+
+            if (value) value = Number(value).toLocaleString('en-US');
+
+            input.value = value;
+
+        });
+
+
+
+        const btn = document.getElementById('btnSimpan') as HTMLButtonElement | null;
+
+        const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
+
+
+
+        btn?.addEventListener('click', async () => {
+
+            if (!btn) return;
+
+
+
+            const rawNominal = nominalEl ? Number(nominalEl.value.replace(/,/g, '')) : 0;
+
+            if (!rawNominal || rawNominal <= 0) {
+
+                alert('Silakan masukkan nominal transaksi yang valid.');
+
                 return;
+
             }
 
-            if (data) {
-                const elPerputaran = document.getElementById('val-perputaran');
-                if (elPerputaran) elPerputaran.innerText = formatRupiah(data.Perputaran);
-                
-                const sisaBulananEl = document.getElementById('val-sisa-bulanan');
-                let sisaBulananVal = Number(data.Sisa_Bulanan) || 0;
-                if (sisaBulananEl) {
-                    sisaBulananEl.classList.remove('text-indigo-600', 'text-emerald-600', 'text-rose-600');
-                    if (sisaBulananVal < 0) {
-                        sisaBulananEl.innerText = '-Rp ' + formatRupiah(Math.abs(sisaBulananVal)).replace('Rp ', '');
-                        sisaBulananEl.classList.add('text-rose-600');
-                    } else {
-                        sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
-                        sisaBulananEl.classList.add('text-emerald-600');
-                    }
-                }
 
-                const elSisaAkhir = document.getElementById('val-sisa-akhir');
-                let sisaAkhirVal = Number(data.Sisa_Akhir) || 0;
-                if (elSisaAkhir) {
-                    elSisaAkhir.classList.remove('text-emerald-700', 'text-emerald-600', 'text-rose-600');
-                    if (sisaAkhirVal < 0) {
-                        elSisaAkhir.innerText = '-Rp ' + formatRupiah(Math.abs(sisaAkhirVal)).replace('Rp ', '');
-                        elSisaAkhir.classList.add('text-rose-600');
-                    } else {
-                        elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
-                        elSisaAkhir.classList.add('text-emerald-600');
-                    }
-                }
 
-                const elPemasukan = document.getElementById('val-pemasukan');
-                if (elPemasukan) elPemasukan.innerText = formatRupiah(data.Pemasukan);
+            if (btnText) btnText.innerText = 'Menyimpan...';
 
-                const elPengeluaran = document.getElementById('val-pengeluaran');
-                if (elPengeluaran) elPengeluaran.innerText = formatRupiah(data.Pengeluaran);
+            btn.disabled = true;
+
+
+
+            const sumberEl = document.getElementById('sumber') as HTMLSelectElement | null;
+
+            const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
+
+            const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
+
+
+
+            try {
+
+                // HANYA INSERT KE TABEL TRANSAKSI.
+
+                // Database Trigger Supabase akan memperbarui tabel summary secara otomatis.
+
+                const { error: errorInsert } = await supabase
+
+                    .from('transaksi')
+
+                    .insert([{
+
+                        jenis: 'In',
+
+                        angka: rawNominal,
+
+                        sumber: sumberEl ? sumberEl.value : 'Rutin',
+
+                        kategori: kategoriEl ? kategoriEl.value : 'Usaha',
+
+                        waktu: waktuEl ? waktuEl.value : new Date().toISOString(),
+
+                        catatan: catatanEl ? catatanEl.value : ''
+
+                    }]);
+
+
+
+                if (errorInsert) throw errorInsert;
+
+
+
+                // Langsung kembali ke Dashboard
+
+                window.location.href = '/';
+
+
+
+            } catch (error) {
+
+                console.error('Gagal menyimpan pemasukan:', error);
+
+                alert('Terjadi kesalahan saat menyimpan data.');
+
+                if (btnText) btnText.innerText = 'Simpan Pemasukan';
+
+                btn.disabled = false;
+
             }
-        }
 
-        async function fetchTransactions() {
-            const container = document.getElementById('list-transaksi');
-            if (!container) return;
+        });
 
-            const { data, error } = await supabase
-                .from('transaksi')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(4);
-
-            if (error) {
-                console.error('Gagal memuat transaksi:', error);
-                container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Gagal memuat transaksi</p>`;
-                return;
-            }
-
-            if (data && data.length > 0) {
-                container.innerHTML = data.map(item => {
-                    const isIn = item.jenis === 'In';
-                    const sign = isIn ? '+' : '-';
-                    const bgClass = isIn ? 'bg-emerald-50' : 'bg-rose-50';
-                    const textClass = isIn ? 'text-emerald-600' : 'text-rose-600';
-                    const nominal = `${sign} ${formatRupiah(item.angka)}`;
-
-                    return `
-                        <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-9 h-9 rounded-xl ${bgClass} ${textClass} flex items-center justify-center font-bold text-base">
-                                    ${sign}
-                                </div>
-                                <div>
-                                    <p class="text-xs font-semibold text-slate-800">${item.catatan || '-'}</p>
-                                    <p class="text-[10px] text-slate-400">${item.waktu || ''} • ${item.kategori || '-'}</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold ${textClass}">${nominal}</span>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada transaksi</p>`;
-            }
-        }
-
-        // Jalankan fetch awal
-        fetchSummary();
-        fetchTransactions();
-
-        // Subscription Realtime Summary
-        supabase
-            .channel('public:summary')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
-                fetchSummary();
-            })
-            .subscribe();
-
-        // Subscription Realtime Transaksi
-        supabase
-            .channel('public:transaksi')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
-                fetchTransactions();
-                fetchSummary(); // Ikut refresh summary saat ada perubahan transaksi
-            })
-            .subscribe();
     </script>
+
 </body>
-</html>
+
+</html> 
+
