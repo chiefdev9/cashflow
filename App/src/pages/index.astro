@@ -45,9 +45,15 @@ import '../styles/global.css';
             <!-- Top Bar: Profil & Inisial & Floating Island Toast & Tombol Sync -->
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
                 <div class="flex items-center space-x-2.5">
-                    <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-xs">
-                        ST
-                    </div>
+                    <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-xs overflow-hidden">
+  <Image 
+    src="/rp.jpg" 
+    alt="Foto Profil ST" 
+    width={36} 
+    height={36} 
+    class="w-full h-full object-cover" 
+  />
+</div>
                     <div>
                         <p class="text-[10px] text-slate-500 font-medium leading-none">Cashflow Tanaejka</p>
                         <h2 id="header-bulan" class="text-xs font-bold text-slate-800 mt-0.5">Memuat...</h2>
