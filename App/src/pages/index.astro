@@ -1,7 +1,7 @@
 --- 
 /* 
     FILE: index.astro
-    DESKRIPSI: Dashboard Cashflow Tanaejka (Integrasi UI Mobile Native PWA + Backend Supabase Realtime Lengkap).
+    DESKRIPSI: Dashboard Cashflow Tanaejka (Integrasi UI Mobile Native PWA + Backend Supabase Realtime + Trigger GAS + Island Toast).
 */
 
 import { Image } from 'astro:assets';
@@ -40,7 +40,7 @@ import '../styles/global.css';
                 />
             </div>
 
-            <!-- Top Bar: Profil & Inisial -->
+            <!-- Top Bar: Profil & Inisial & Floating Island Toast & Tombol Sync -->
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 shadow-xs">
@@ -51,10 +51,23 @@ import '../styles/global.css';
                         <h2 id="header-bulan" class="text-xs font-bold text-slate-800 mt-0.5">Memuat...</h2>
                     </div>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
+
+                <!-- DYNAMIC ISLAND FLOATING NOTIFICATION & SYNC BUTTON -->
+                <div class="flex items-center space-x-2">
+                    
+                    <!-- Floating Island Toast (Hidden by Default) -->
+                    <div id="toast-island" class="hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5">
+                        <span id="toast-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span id="toast-message" class="whitespace-nowrap tracking-tight">sync spreadsheet berhasil</span>
+                    </div>
+
+                    <!-- ICON SYNC TRIGGER GAS -->
+                    <button id="btn-sync-gas" title="Tarik Data Supabase ke Google Sheet" class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-xs active:scale-95 transition cursor-pointer hover:bg-slate-100">
+                        <svg id="icon-sync" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+
                 </div>
             </div>
 
@@ -121,13 +134,16 @@ import '../styles/global.css';
 
     </div>
 
-    <!-- SCRIPT REALTIME SUPABASE & MANAJEMEN DASHBOARD (100% UTUH) -->
+    <!-- SCRIPT REALTIME SUPABASE & MANAJEMEN DASHBOARD -->
     <script>
         import { createClient } from '@supabase/supabase-js';
 
         const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
         
+        // URL WEB APP GAS ANDA
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF1sqp_AV8xjAYNQk7u0qEpbLHeerfzCZ3IivMNhMrEsx49kEIiLXVkg/exec";
+
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         const now = new Date();
@@ -254,7 +270,7 @@ import '../styles/global.css';
         // Subscription Realtime Summary
         supabase
             .channel('public:summary')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, payload => {
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, () => {
                 fetchSummary();
             })
             .subscribe();
@@ -264,9 +280,80 @@ import '../styles/global.css';
             .channel('public:transaksi')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
                 fetchTransactions();
-                fetchSummary(); // Ikut refresh summary saat ada perubahan transaksi
+                fetchSummary();
             })
             .subscribe();
+
+        // LOGIKA PENANGANAN KLIK ICON SYNC & DYNAMIC ISLAND TOAST
+        const btnSyncGas = document.getElementById('btn-sync-gas');
+        const iconSync = document.getElementById('icon-sync');
+        
+        const toastIsland = document.getElementById('toast-island');
+        const toastMessage = document.getElementById('toast-message');
+        const toastDot = document.getElementById('toast-status-dot');
+
+        let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+        function showDynamicToast(msg: string, isSuccess: boolean) {
+            if (!toastIsland || !toastMessage || !toastDot) return;
+
+            // Reset timer sebelumnya jika ada
+            if (toastTimer) clearTimeout(toastTimer);
+
+            // Set teks & indikator warna
+            toastMessage.innerText = msg;
+            if (isSuccess) {
+                toastDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+            } else {
+                toastDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse';
+            }
+
+            // Tampilkan dengan animasi Smooth Pop
+            toastIsland.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                toastIsland.classList.remove('opacity-0', 'translate-y-1');
+                toastIsland.classList.add('opacity-100', 'translate-y-0');
+            });
+
+            // Hilang otomatis setelah 2.5 detik
+            toastTimer = setTimeout(() => {
+                toastIsland.classList.remove('opacity-100', 'translate-y-0');
+                toastIsland.classList.add('opacity-0', 'translate-y-1');
+                
+                setTimeout(() => {
+                    toastIsland.classList.add('hidden');
+                }, 300);
+            }, 2500);
+        }
+
+        if (btnSyncGas) {
+            btnSyncGas.addEventListener('click', async () => {
+                // 1. Mulai animasi berputar & ubah warna ikon menjadi indigo saat skrip GAS berjalan
+                if (iconSync) {
+                    iconSync.classList.add('animate-spin', 'text-indigo-600');
+                }
+
+                try {
+                    const response = await fetch(GAS_WEB_APP_URL, {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        showDynamicToast("sync spreadsheet berhasil", true);
+                    } else {
+                        showDynamicToast("sync spreadsheet gagal", false);
+                    }
+                } catch (err) {
+                    console.error("Gagal memanggil GAS:", err);
+                    showDynamicToast("sync spreadsheet gagal", false);
+                } finally {
+                    // 2. Berhenti berputar setelah respons dari GAS diterima
+                    if (iconSync) {
+                        iconSync.classList.remove('animate-spin', 'text-indigo-600');
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
