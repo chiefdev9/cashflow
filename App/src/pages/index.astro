@@ -1,7 +1,7 @@
 --- 
 /* 
     FILE: index.astro
-    DESKRIPSI: Dashboard Cashflow Tanaejka (Integrasi UI Mobile Native PWA + Backend Supabase Realtime + Trigger GAS + Island Toast).
+    DESKRIPSI: Dashboard Cashflow Tanaejka (Integrasi UI Mobile Native PWA + Backend Supabase Realtime + Trigger GAS + Island Toast Simetris).
 */
 
 import { Image } from 'astro:assets';
@@ -57,7 +57,8 @@ import '../styles/global.css';
                     
                     <!-- Floating Island Toast (Hidden by Default) -->
                     <div id="toast-island" class="hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5">
-                        <span id="toast-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <!-- Indikator Lingkaran Bulat Sempurna (Kunci flex-shrink-0 dan aspect-square) -->
+                        <span id="toast-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square"></span>
                         <span id="toast-message" class="whitespace-nowrap tracking-tight">sync spreadsheet berhasil</span>
                     </div>
 
@@ -300,12 +301,12 @@ import '../styles/global.css';
             // Reset timer sebelumnya jika ada
             if (toastTimer) clearTimeout(toastTimer);
 
-            // Set teks & indikator warna
+            // Set teks & indikator warna (Diberikan flex-shrink-0 dan aspect-square agar selalu bulat simetris)
             toastMessage.innerText = msg;
             if (isSuccess) {
-                toastDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+                toastDot.className = 'w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square animate-pulse';
             } else {
-                toastDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse';
+                toastDot.className = 'w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 aspect-square animate-pulse';
             }
 
             // Tampilkan dengan animasi Smooth Pop
