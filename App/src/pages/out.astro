@@ -1,234 +1,873 @@
 --- 
+
+
+
 /* 
-    FILE: out.astro
-    DESKRIPSI: Form Tambah Pengeluaran (Simpan ke Supabase & Update Tabel Summary via Trigger).
+
+
+
+   FILE: out.astro
+
+
+
+   DESKRIPSI: Form Tambah Pengeluaran (Simpan ke Supabase & Update Tabel Summary via Trigger).
+
+
+
 */
 
+
+
+
+
+
+
 import { Image } from 'astro:assets';
+
+
+
 import '../styles/global.css';
+
+
+
 ---
 
+
+
+
+
+
+
 <!DOCTYPE html>
+
+
+
 <html lang="id">
+
+
+
 <head>
+
+
+
     <link rel="manifest" href="/site.webmanifest" />
+
+
+
     <meta charset="UTF-8">
+
+
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+
+
     <title>Tambah Pengeluaran - Cashflow Tanaejka</title>
+
+
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+
     <style>
+
+
+
         body { font-family: 'Inter', sans-serif; }
+
+
+
     </style>
+
+
+
 </head>
+
+
+
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
+
+
+
+
+
+
     <!-- Container Utama: Frame HP -->
+
+
+
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
+
+
+
+
+
+
         <!-- Header -->
+
+
+
         <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
+
+
+
             <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
+
+
+
                 <Image 
+
+
+
                     src="/bg.jpg" 
+
+
+
                     alt="Aksen Vektor Header" 
+
+
+
                     width={800}
+
+
+
                     height={600}
+
+
+
                     class="w-full h-full object-cover scale-125 transform"
+
+
+
                 />
+
+
+
             </div>
+
+
+
+
+
+
 
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
+
+
+
                 <a href="/" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs">
+
+
+
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+
+
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+
+
+
                     </svg>
+
+
+
                 </a>
+
+
+
                 <h2 class="text-sm font-bold text-slate-800">Tambah Transaksi Baru</h2>
+
+
+
                 <div class="w-9"></div>
+
+
+
             </div>
+
+
+
+
+
+
 
             <!-- Switch In / Out -->
+
+
+
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
+
+
+
                 <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
+
+
+
                     Pemasukan (In)
+
+
+
                 </a>
+
+
+
                 <a href="/out" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-rose-600 text-white shadow-xs cursor-pointer">
+
+
+
                     Pengeluaran (Out)
+
+
+
                 </a>
+
+
+
             </div>
+
+
+
         </header>
 
+
+
+
+
+
+
         <!-- Main Form Content -->
+
+
+
         <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
+
+
+
             <form id="formOut" class="space-y-3 sm:space-y-4">
+
+
+
                 
-                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        Nominal Pengeluaran
-                    </label>
-                    <div class="relative flex items-center">
-                        <span class="text-lg font-bold text-slate-400 mr-2">Rp</span>
-                        <input 
-                            id="nominal"
-                            type="text" 
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="0" 
-                            class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300"
-                            required
-                        />
-                    </div>
-                </div>
+
+
 
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+
+
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        Sumber
+
+
+
+                        Nominal Pengeluaran
+
+
+
                     </label>
-                    <select id="sumber" class="w-full text-sm font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
-                        <option value="Rutin">Rutin</option>
-                        <option value="Tentatif">Tentatif</option>
-                    </select>
+
+
+
+                    <div class="relative flex items-center">
+
+
+
+                        <span class="text-lg font-bold text-slate-400 mr-2">Rp</span>
+
+
+
+                        <input 
+
+
+
+                            id="nominal"
+
+
+
+                            type="text" 
+
+
+
+                            inputmode="numeric"
+
+
+
+                            pattern="[0-9]*"
+
+
+
+                            placeholder="0" 
+
+
+
+                            class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300"
+
+
+
+                            required
+
+
+
+                        />
+
+
+
+                    </div>
+
+
+
                 </div>
+
+
+
+
+
+
+
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+
+
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+
+
+                        Sumber
+
+
+
+                    </label>
+
+
+
+                    <select id="sumber" class="w-full text-sm font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
+
+
+
+                        <option value="Rutin">Rutin</option>
+
+
+
+                        <option value="Tentatif">Tentatif</option>
+
+
+
+                    </select>
+
+
+
+                </div>
+
+
+
+
+
+
 
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                            Kategori
-                        </label>
-                        <select id="kategori" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
-                            <option value="Kebutuhan Pokok">Kebutuhan Pokok</option>
-                            <option value="Transportasi">Transportasi</option>
-                            <option value="Hiburan">Hiburan</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
+
+
 
                     <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+
+
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                            Tanggal
+
+
+
+                            Kategori
+
+
+
                         </label>
-                        <input 
-                            id="waktu"
-                            type="date" 
-                            class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer"
-                        />
+
+
+
+                        <select id="kategori" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
+
+
+
+                            <option value="Kebutuhan Pokok">Kebutuhan Pokok</option>
+
+
+
+                            <option value="Transportasi">Transportasi</option>
+
+
+
+                            <option value="Hiburan">Hiburan</option>
+
+
+
+                            <option value="Lainnya">Lainnya</option>
+
+
+
+                        </select>
+
+
+
                     </div>
+
+
+
+
+
+
+
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+
+
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+
+
+                            Tanggal
+
+
+
+                        </label>
+
+
+
+                        <input 
+
+
+
+                            id="waktu"
+
+
+
+                            type="date" 
+
+
+
+                            class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer"
+
+
+
+                        />
+
+
+
+                    </div>
+
+
+
                 </div>
+
+
+
+
+
+
 
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+
+
+
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+
+
+
                         Catatan (Opsional)
+
+
+
                     </label>
+
+
+
                     <textarea 
+
+
+
                         id="catatan"
+
+
+
                         rows="2"
+
+
+
                         placeholder="Tambahkan detail catatan jika perlu..." 
+
+
+
                         class="w-full text-xs text-slate-800 focus:outline-none bg-transparent placeholder-slate-300 resize-none font-medium"
+
+
+
                     ></textarea>
+
+
+
                 </div>
+
+
+
             </form>
+
+
+
         </main>
 
+
+
+
+
+
+
         <!-- Tombol Simpan Pengeluaran -->
+
+
+
         <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
+
+
+
             <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+
+
+
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+
+
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+
+
+
                 </svg>
+
+
+
                 <span id="btnText">Simpan Pengeluaran</span>
+
+
+
             </button>
+
+
+
         </div>
+
+
+
+
+
+
 
     </div>
 
+
+
+
+
+
+
     <script>
+
+
+
         import { createClient } from '@supabase/supabase-js';
 
+
+
+
+
+
+
         const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
+
+
+
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
+
+
+
         
+
+
+
         const supabase = createClient(supabaseUrl, supabaseKey);
 
+
+
+
+
+
+
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
+
+
+
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
+
+
+
+
+
+
         // Set default nilai tanggal hari ini (YYYY-MM-DD)
+
+
+
         if (waktuEl) {
+
+
+
             const today = new Date();
+
+
+
             const yyyy = today.getFullYear();
+
+
+
             const mm = String(today.getMonth() + 1).padStart(2, '0');
+
+
+
             const dd = String(today.getDate()).padStart(2, '0');
+
+
+
             waktuEl.value = `${yyyy}-${mm}-${dd}`;
+
+
+
         }
 
-        // Format angka ribuan dengan koma saat mengetik
+
+
+
+
+
+
+        // Format angka ribuan dengan koma
+
+
+
         nominalEl?.addEventListener('input', (e) => {
+
+
+
             const input = e.target as HTMLInputElement;
+
+
+
             let value = input.value.replace(/\D/g, '');
+
+
+
             if (value) value = Number(value).toLocaleString('en-US');
+
+
+
             input.value = value;
+
+
+
         });
 
+
+
+
+
+
+
         const btn = document.getElementById('btnSimpan') as HTMLButtonElement | null;
+
+
+
         const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
 
+
+
+
+
+
+
         btn?.addEventListener('click', async () => {
+
+
+
             if (!btn) return;
 
+
+
+
+
+
+
             const rawNominal = nominalEl ? Number(nominalEl.value.replace(/,/g, '')) : 0;
+
+
+
             if (!rawNominal || rawNominal <= 0) {
+
+
+
                 alert('Silakan masukkan nominal transaksi yang valid.');
+
+
+
                 return;
+
+
+
             }
 
+
+
+
+
+
+
             if (btnText) btnText.innerText = 'Menyimpan...';
+
+
+
             btn.disabled = true;
 
+
+
+
+
+
+
             const sumberEl = document.getElementById('sumber') as HTMLSelectElement | null;
+
+
+
             const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
+
+
+
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
-            const tanggalInput = waktuEl ? waktuEl.value : new Date().toISOString().split('T')[0];
 
-            // 1. Buat timestamp ISO gabungan tanggal pilihan + jam saat ini untuk 'created_at'
-            const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0]; // HH:MM:SS
-            const created_at = new Date(`${tanggalInput}T${timeStr}`).toISOString();
 
-            // 2. Format string tampilan teks untuk kolom 'waktu' (contoh: "01 Sep 2026")
-            const dateObj = new Date(tanggalInput);
-            const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const formattedWaktu = `${String(dateObj.getDate()).padStart(2, '0')} ${shortMonths[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
-            // 3. Generate UUID eksplisit dari JS untuk menghindari masalah schema/cache Supabase & deduplikasi GAS
-            const generatedId = crypto.randomUUID();
+
+
+
 
             try {
-                // INSERT KE TABEL TRANSAKSI DENGAN ID UUID BARU
+
+
+
+                // HANYA LAKUKAN INSERT KE TABEL TRANSAKSI.
+
+
+
+                // Trigger Supabase akan meng-update tabel 'summary' secara otomatis!
+
+
+
                 const { error: errorInsert } = await supabase
+
+
+
                     .from('transaksi')
+
+
+
                     .insert([{
-                        id: generatedId,
+
+
+
                         jenis: 'Out',
+
+
+
                         angka: rawNominal,
+
+
+
                         sumber: sumberEl ? sumberEl.value : 'Rutin',
+
+
+
                         kategori: kategoriEl ? kategoriEl.value : 'Kebutuhan Pokok',
-                        waktu: formattedWaktu,
-                        created_at: created_at,
-                        catatan: catatanEl && catatanEl.value.trim() !== '' ? catatanEl.value.trim() : '-'
+
+
+
+                        waktu: waktuEl ? waktuEl.value : new Date().toISOString(),
+
+
+
+                        catatan: catatanEl ? catatanEl.value : ''
+
+
+
                     }]);
+
+
+
+
+
+
 
                 if (errorInsert) throw errorInsert;
 
-                // Berhasil: Redirect kembali ke Dashboard Utama
+
+
+
+
+
+
+                // Langsung arahkan kembali ke Dashboard
+
+
+
                 window.location.href = '/';
 
-            } catch (error: any) {
+
+
+
+
+
+
+            } catch (error) {
+
+
+
                 console.error('Gagal menyimpan pengeluaran:', error);
-                alert(`Gagal menyimpan: ${error?.message || 'Terjadi kesalahan sistem.'}`);
+
+
+
+                alert('Terjadi kesalahan saat menyimpan data.');
+
+
+
                 if (btnText) btnText.innerText = 'Simpan Pengeluaran';
+
+
+
                 btn.disabled = false;
+
+
+
             }
+
+
+
         });
+
+
+
     </script>
+
+
+
 </body>
+
+
+
 </html>
