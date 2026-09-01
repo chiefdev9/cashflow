@@ -199,11 +199,15 @@ import '../styles/global.css';
             const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const formattedWaktu = `${String(dateObj.getDate()).padStart(2, '0')} ${shortMonths[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
+            // 3. Generate UUID eksplisit di sisi JS agar tidak memicu error schema/cache Supabase
+            const generatedId = crypto.randomUUID();
+
             try {
-                // INSERT KE TABEL TRANSAKSI WITH CREATED_AT PADA TANGGAL PILIHAN
+                // INSERT KE TABEL TRANSAKSI DENGAN ID UUID BARU
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
+                        id: generatedId,
                         jenis: 'In',
                         angka: rawNominal,
                         sumber: sumberEl ? sumberEl.value : 'Rutin',
