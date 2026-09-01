@@ -1,5 +1,7 @@
 --- 
 /* 
+    SI IBU SOK NEKEN TOMBOL KEMBALI BAE AMPUNN
+
     FILE: index.astro
     DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
 */
@@ -267,6 +269,14 @@ import '../styles/global.css';
         // Fetch awal
         fetchSummary();
         fetchTransactions();
+
+        // Mencegah masalah cache BFCache saat tombol 'Back' ditekan
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                fetchSummary();
+                fetchTransactions();
+            }
+        });
 
         // Realtime Subscription
         supabase
