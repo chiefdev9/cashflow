@@ -143,11 +143,11 @@ import '../styles/global.css';
         const monthIndex = now.getMonth(); 
         const year = now.getFullYear();
 
-        // Singkatan bulan persis sama dengan output Postgres to_char(date, 'Mon')
-        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        // Singkatan bulan DISESUAIKAN PERSIS dengan nilai string yang dihasilkan Trigger SQL Supabase
+        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-        // Nama bulan untuk pencarian di DB (Sep, Oct, dst)
+        // Nama bulan untuk pencarian di DB ('Agust', 'Sept', dst)
         const TARGET_BULAN = shortMonths[monthIndex]; 
         const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
 
@@ -164,7 +164,7 @@ import '../styles/global.css';
         }
 
         async function fetchSummary() {
-            // Mengambil baris bulan berjalan (misal: 'Sep')
+            // Mengambil baris bulan berjalan (misal: 'Sept')
             const { data, error } = await supabase
                 .from('summary')
                 .select('*')
