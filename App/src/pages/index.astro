@@ -2,6 +2,7 @@
 /* 
     SI IBU SOK NEKEN TOMBOL KEMBALI BAE AMPUNN
     TOMBOL SYNC GAS SAAT BERJALAN TIDAK DAPAT DI TEKAN SAMPAI PROSES SELESAI
+    MENGATASI KEBIASAAN IBU BUKA LEWAT RECENT APP
 
     FILE: index.astro
     DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
@@ -270,6 +271,20 @@ import '../styles/global.css';
         // Fetch awal
         fetchSummary();
         fetchTransactions();
+
+        // Auto-refresh data saat PWA dibuka kembali dari Recent Apps
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                fetchSummary();
+                fetchTransactions();
+            }
+        });
+
+        // Backup refresh saat window mendapatkan fokus kembali
+        window.addEventListener('focus', () => {
+            fetchSummary();
+            fetchTransactions();
+        });
 
         // Mencegah masalah cache BFCache saat tombol 'Back' ditekan
         window.addEventListener('pageshow', (event) => {
