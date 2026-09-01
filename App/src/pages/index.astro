@@ -1,7 +1,5 @@
 --- 
 /* 
-
-INDEX PALING STABIL NAMUN PHOTO Profil MASIH ST BELUM DITENTUKAN
     FILE: index.astro
     DESKRIPSI: Dashboard Cashflow Tanaejka (Integrasi UI Mobile Native PWA + Backend Supabase Realtime + Trigger GAS + Island Toast Simetris).
 */
@@ -40,7 +38,7 @@ import '../styles/global.css';
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
 
-    <!-- Twitter Meta Tags (Menggunakan atribut 'name') -->
+    <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:url" content="https://view-cashflow.vercel.app/" />
     <meta name="twitter:title" content="Cashflow Tanaejka" />
@@ -70,14 +68,14 @@ import '../styles/global.css';
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 overflow-hidden">
-  <Image 
-    src="/rp.jpg" 
-    alt="Foto Profil ST" 
-    width={36} 
-    height={36} 
-    class="w-full h-full object-cover" 
-  />
-</div>
+                        <Image 
+                            src="/rp.jpg" 
+                            alt="Foto Profil ST" 
+                            width={36} 
+                            height={36} 
+                            class="w-full h-full object-cover" 
+                        />
+                    </div>
                     <div>
                         <p class="text-[10px] text-slate-500 font-medium leading-none">Cashflow Tanaejka</p>
                         <h2 id="header-bulan" class="text-xs font-bold text-slate-800 mt-0.5">Memuat...</h2>
@@ -87,9 +85,8 @@ import '../styles/global.css';
                 <!-- DYNAMIC ISLAND FLOATING NOTIFICATION & SYNC BUTTON -->
                 <div class="flex items-center space-x-2">
                     
-                    <!-- Floating Island Toast (Hidden by Default) -->
+                    <!-- Floating Island Toast -->
                     <div id="toast-island" class="hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5">
-                        <!-- Indikator Lingkaran Bulat Sempurna (Kunci flex-shrink-0 dan aspect-square) -->
                         <span id="toast-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square"></span>
                         <span id="toast-message" class="whitespace-nowrap tracking-tight">sync spreadsheet berhasil</span>
                     </div>
@@ -183,8 +180,15 @@ import '../styles/global.css';
         const monthIndex = now.getMonth(); 
         const year = now.getFullYear();
 
-        // NAMA BULAN DISESUAIKAN PERSIS DENGAN TABEL SUMMARY SUPABASE ('Juni', 'Juli', 'Agust')
-        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Juni', 'Juli', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
+        // FORMAT SINKRON DENGAN POSTGRESQL to_char(date, 'Mon')
+        // Agustus didukung dual ('Aug' / 'Agust'), September = 'Sep', dst.
+        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Sep' === 'Sep' && monthIndex === 7 ? 'Agust' : 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
+        // Khusus Agustus: Jika di DB kamu terlanjur memakai 'Agust', tetap support 'Agust'
+        if (monthIndex === 7) {
+            shortMonths[7] = 'Agust';
+        }
+
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
         const TARGET_BULAN = shortMonths[monthIndex]; 
@@ -203,53 +207,60 @@ import '../styles/global.css';
         }
 
         async function fetchSummary() {
+            // Gunakan maybeSingle() agar jika baris bulan baru belum ada, aplikasi TIDAK ERROR/CRASH
             const { data, error } = await supabase
                 .from('summary')
                 .select('*')
                 .eq('Bulan', TARGET_BULAN)
-                .single();
+                .maybeSingle();
 
             if (error) {
                 console.error('Gagal memuat data ringkasan:', error);
-                return;
             }
 
-            if (data) {
-                const elPerputaran = document.getElementById('val-perputaran');
-                if (elPerputaran) elPerputaran.innerText = formatRupiah(data.Perputaran);
-                
-                const sisaBulananEl = document.getElementById('val-sisa-bulanan');
-                let sisaBulananVal = Number(data.Sisa_Bulanan) || 0;
-                if (sisaBulananEl) {
-                    sisaBulananEl.classList.remove('text-indigo-600', 'text-emerald-600', 'text-rose-600');
-                    if (sisaBulananVal < 0) {
-                        sisaBulananEl.innerText = '-Rp ' + formatRupiah(Math.abs(sisaBulananVal)).replace('Rp ', '');
-                        sisaBulananEl.classList.add('text-rose-600');
-                    } else {
-                        sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
-                        sisaBulananEl.classList.add('text-emerald-600');
-                    }
+            // Fallback ke 0 jika data belum ada di Supabase saat awal bulan
+            const summaryData = data || {
+                Perputaran: 0,
+                Sisa_Bulanan: 0,
+                Sisa_Akhir: 0,
+                Pemasukan: 0,
+                Pengeluaran: 0
+            };
+
+            const elPerputaran = document.getElementById('val-perputaran');
+            if (elPerputaran) elPerputaran.innerText = formatRupiah(summaryData.Perputaran);
+            
+            const sisaBulananEl = document.getElementById('val-sisa-bulanan');
+            let sisaBulananVal = Number(summaryData.Sisa_Bulanan) || 0;
+            if (sisaBulananEl) {
+                sisaBulananEl.classList.remove('text-indigo-600', 'text-emerald-600', 'text-rose-600');
+                if (sisaBulananVal < 0) {
+                    sisaBulananEl.innerText = '-Rp ' + formatRupiah(Math.abs(sisaBulananVal)).replace('Rp ', '');
+                    sisaBulananEl.classList.add('text-rose-600');
+                } else {
+                    sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
+                    sisaBulananEl.classList.add('text-emerald-600');
                 }
-
-                const elSisaAkhir = document.getElementById('val-sisa-akhir');
-                let sisaAkhirVal = Number(data.Sisa_Akhir) || 0;
-                if (elSisaAkhir) {
-                    elSisaAkhir.classList.remove('text-emerald-700', 'text-emerald-600', 'text-rose-600');
-                    if (sisaAkhirVal < 0) {
-                        elSisaAkhir.innerText = '-Rp ' + formatRupiah(Math.abs(sisaAkhirVal)).replace('Rp ', '');
-                        elSisaAkhir.classList.add('text-rose-600');
-                    } else {
-                        elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
-                        elSisaAkhir.classList.add('text-emerald-600');
-                    }
-                }
-
-                const elPemasukan = document.getElementById('val-pemasukan');
-                if (elPemasukan) elPemasukan.innerText = formatRupiah(data.Pemasukan);
-
-                const elPengeluaran = document.getElementById('val-pengeluaran');
-                if (elPengeluaran) elPengeluaran.innerText = formatRupiah(data.Pengeluaran);
             }
+
+            const elSisaAkhir = document.getElementById('val-sisa-akhir');
+            let sisaAkhirVal = Number(summaryData.Sisa_Akhir) || 0;
+            if (elSisaAkhir) {
+                elSisaAkhir.classList.remove('text-emerald-700', 'text-emerald-600', 'text-rose-600');
+                if (sisaAkhirVal < 0) {
+                    elSisaAkhir.innerText = '-Rp ' + formatRupiah(Math.abs(sisaAkhirVal)).replace('Rp ', '');
+                    elSisaAkhir.classList.add('text-rose-600');
+                } else {
+                    elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
+                    elSisaAkhir.classList.add('text-emerald-600');
+                }
+            }
+
+            const elPemasukan = document.getElementById('val-pemasukan');
+            if (elPemasukan) elPemasukan.innerText = formatRupiah(summaryData.Pemasukan);
+
+            const elPengeluaran = document.getElementById('val-pengeluaran');
+            if (elPengeluaran) elPengeluaran.innerText = formatRupiah(summaryData.Pengeluaran);
         }
 
         async function fetchTransactions() {
@@ -330,10 +341,8 @@ import '../styles/global.css';
         function showDynamicToast(msg: string, isSuccess: boolean) {
             if (!toastIsland || !toastMessage || !toastDot) return;
 
-            // Reset timer sebelumnya jika ada
             if (toastTimer) clearTimeout(toastTimer);
 
-            // Set teks & indikator warna (Diberikan flex-shrink-0 dan aspect-square agar selalu bulat simetris)
             toastMessage.innerText = msg;
             if (isSuccess) {
                 toastDot.className = 'w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square animate-pulse';
@@ -341,14 +350,12 @@ import '../styles/global.css';
                 toastDot.className = 'w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 aspect-square animate-pulse';
             }
 
-            // Tampilkan dengan animasi Smooth Pop
             toastIsland.classList.remove('hidden');
             requestAnimationFrame(() => {
                 toastIsland.classList.remove('opacity-0', 'translate-y-1');
                 toastIsland.classList.add('opacity-100', 'translate-y-0');
             });
 
-            // Hilang otomatis setelah 2.5 detik
             toastTimer = setTimeout(() => {
                 toastIsland.classList.remove('opacity-100', 'translate-y-0');
                 toastIsland.classList.add('opacity-0', 'translate-y-1');
@@ -361,7 +368,6 @@ import '../styles/global.css';
 
         if (btnSyncGas) {
             btnSyncGas.addEventListener('click', async () => {
-                // 1. Mulai animasi berputar & ubah warna ikon menjadi indigo saat skrip GAS berjalan
                 if (iconSync) {
                     iconSync.classList.add('animate-spin', 'text-indigo-600');
                 }
@@ -380,7 +386,6 @@ import '../styles/global.css';
                     console.error("Gagal memanggil GAS:", err);
                     showDynamicToast("sync spreadsheet gagal", false);
                 } finally {
-                    // 2. Berhenti berputar setelah respons dari GAS diterima
                     if (iconSync) {
                         iconSync.classList.remove('animate-spin', 'text-indigo-600');
                     }
