@@ -1,7 +1,7 @@
 --- 
 /* 
     FILE: index.astro
-    DESKRIPSI: Dashboard Cashflow Tanaejka (Integrasi UI Mobile Native PWA + Backend Supabase Realtime + Trigger GAS + Island Toast Simetris).
+    DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
 */
 
 import { Image } from 'astro:assets';
@@ -11,7 +11,6 @@ import '../styles/global.css';
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- Basic Meta Settings (Di paling atas) -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
@@ -22,38 +21,16 @@ import '../styles/global.css';
         body { font-family: 'Inter', sans-serif; }
     </style>
 
-    <!-- Primary Meta Tags -->
     <title>Cashflow Tanaejka</title>
     <meta name="title" content="Cashflow Tanaejka" />
     <meta name="description" content="Cashflow summary - evaluate here for a brighter future" />
-
-    <!-- Open Graph / Facebook & WhatsApp -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://view-cashflow.vercel.app/" />
-    <meta property="og:title" content="Cashflow Tanaejka" />
-    <meta property="og:description" content="Cashflow summary - evaluate here for a brighter future" />
-    <meta property="og:image" content="https://view-cashflow.vercel.app/android-chrome-512x512.png" />
-    <meta property="og:image:secure_url" content="https://view-cashflow.vercel.app/android-chrome-512x512.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:url" content="https://view-cashflow.vercel.app/" />
-    <meta name="twitter:title" content="Cashflow Tanaejka" />
-    <meta name="twitter:description" content="Cashflow summary - evaluate here for a brighter future" />
-    <meta name="twitter:image" content="https://view-cashflow.vercel.app/android-chrome-512x512.png" />
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Frame HP -->
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
         <!-- HEADER / SALDO -->
         <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
-            
-            <!-- Background Vektor -->
             <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
                 <Image 
                     src="/bg.jpg" 
@@ -64,7 +41,6 @@ import '../styles/global.css';
                 />
             </div>
 
-            <!-- Top Bar: Profil & Inisial & Floating Island Toast & Tombol Sync -->
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 overflow-hidden">
@@ -82,29 +58,21 @@ import '../styles/global.css';
                     </div>
                 </div>
 
-                <!-- DYNAMIC ISLAND FLOATING NOTIFICATION & SYNC BUTTON -->
                 <div class="flex items-center space-x-2">
-                    
-                    <!-- Floating Island Toast -->
                     <div id="toast-island" class="hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5">
                         <span id="toast-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square"></span>
                         <span id="toast-message" class="whitespace-nowrap tracking-tight">sync spreadsheet berhasil</span>
                     </div>
 
-                    <!-- ICON SYNC TRIGGER GAS -->
                     <button id="btn-sync-gas" title="Tarik Data Supabase ke Google Sheet" class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-xs active:scale-95 transition cursor-pointer hover:bg-slate-100">
                         <svg id="icon-sync" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
                     </button>
-
                 </div>
             </div>
 
-            <!-- Main Card 3 Kolom -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-3 rounded-2xl shadow-xs relative z-10 space-y-2">
-                
-                <!-- Baris 1: Tiga Metrik Utama -->
                 <div class="grid grid-cols-3 gap-1">
                     <div>
                         <span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Perputaran</span>
@@ -122,7 +90,6 @@ import '../styles/global.css';
 
                 <div class="border-t border-slate-200/60"></div>
 
-                <!-- Baris 2: Mini Cards In / Out -->
                 <div class="grid grid-cols-2 gap-2">
                     <div class="bg-slate-50/80 p-1.5 rounded-xl border border-slate-200/60">
                         <p class="text-[9px] text-slate-400 font-medium leading-none">Pemasukan (In)</p>
@@ -133,7 +100,6 @@ import '../styles/global.css';
                         <p id="val-pengeluaran" class="text-xs font-bold text-rose-600 mt-0.5">Memuat...</p>
                     </div>
                 </div>
-
             </div>
         </header>
 
@@ -141,10 +107,9 @@ import '../styles/global.css';
         <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
             <div class="flex justify-between items-center mb-1">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
-                <a href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit?pli=1&gid=962128336#gid=962128336" class="text-xs text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</a>
+                <a href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit?pli=1&gid=962128336#gid=962128336" target="_blank" class="text-xs text-indigo-600 font-medium cursor-pointer hover:underline">Lihat Semua</a>
             </div>
 
-            <!-- Container Dinamis Transaksi -->
             <div id="list-transaksi" class="space-y-2">
                 <p class="text-xs text-slate-400 text-center py-4">Memuat transaksi...</p>
             </div>
@@ -164,14 +129,12 @@ import '../styles/global.css';
 
     </div>
 
-    <!-- SCRIPT REALTIME SUPABASE & MANAJEMEN DASHBOARD -->
+    <!-- SCRIPT REALTIME SUPABASE -->
     <script>
         import { createClient } from '@supabase/supabase-js';
 
         const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
-        
-        // URL WEB APP GAS ANDA
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF1sqp_AV8xjAYNQk7u0qEpbLHeerfzCZ3IivMNhMrEsx49kEIiLXVkg/exec";
 
         const supabase = createClient(supabaseUrl, supabaseKey);
@@ -180,17 +143,11 @@ import '../styles/global.css';
         const monthIndex = now.getMonth(); 
         const year = now.getFullYear();
 
-        // FORMAT SINKRON DENGAN POSTGRESQL to_char(date, 'Mon')
-        // Agustus didukung dual ('Aug' / 'Agust'), September = 'Sep', dst.
-        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Sep' === 'Sep' && monthIndex === 7 ? 'Agust' : 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        
-        // Khusus Agustus: Jika di DB kamu terlanjur memakai 'Agust', tetap support 'Agust'
-        if (monthIndex === 7) {
-            shortMonths[7] = 'Agust';
-        }
-
+        // Singkatan bulan persis sama dengan output Postgres to_char(date, 'Mon')
+        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
+        // Nama bulan untuk pencarian di DB (Sep, Oct, dst)
         const TARGET_BULAN = shortMonths[monthIndex]; 
         const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
 
@@ -207,7 +164,7 @@ import '../styles/global.css';
         }
 
         async function fetchSummary() {
-            // Gunakan maybeSingle() agar jika baris bulan baru belum ada, aplikasi TIDAK ERROR/CRASH
+            // Mengambil baris bulan berjalan (misal: 'Sep')
             const { data, error } = await supabase
                 .from('summary')
                 .select('*')
@@ -218,7 +175,7 @@ import '../styles/global.css';
                 console.error('Gagal memuat data ringkasan:', error);
             }
 
-            // Fallback ke 0 jika data belum ada di Supabase saat awal bulan
+            // Jika belum ada data transaksi sama sekali di bulan baru, defaultkan ke Rp 0
             const summaryData = data || {
                 Perputaran: 0,
                 Sisa_Bulanan: 0,
@@ -307,11 +264,11 @@ import '../styles/global.css';
             }
         }
 
-        // Jalankan fetch awal
+        // Fetch awal
         fetchSummary();
         fetchTransactions();
 
-        // Subscription Realtime Summary
+        // Realtime Subscription
         supabase
             .channel('public:summary')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, () => {
@@ -319,7 +276,6 @@ import '../styles/global.css';
             })
             .subscribe();
 
-        // Subscription Realtime Transaksi
         supabase
             .channel('public:transaksi')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
@@ -328,10 +284,9 @@ import '../styles/global.css';
             })
             .subscribe();
 
-        // LOGIKA PENANGANAN KLIK ICON SYNC & DYNAMIC ISLAND TOAST
+        // Toast & Sync GAS
         const btnSyncGas = document.getElementById('btn-sync-gas');
         const iconSync = document.getElementById('icon-sync');
-        
         const toastIsland = document.getElementById('toast-island');
         const toastMessage = document.getElementById('toast-message');
         const toastDot = document.getElementById('toast-status-dot');
@@ -340,15 +295,12 @@ import '../styles/global.css';
 
         function showDynamicToast(msg: string, isSuccess: boolean) {
             if (!toastIsland || !toastMessage || !toastDot) return;
-
             if (toastTimer) clearTimeout(toastTimer);
 
             toastMessage.innerText = msg;
-            if (isSuccess) {
-                toastDot.className = 'w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square animate-pulse';
-            } else {
-                toastDot.className = 'w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 aspect-square animate-pulse';
-            }
+            toastDot.className = isSuccess 
+                ? 'w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square animate-pulse'
+                : 'w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 aspect-square animate-pulse';
 
             toastIsland.classList.remove('hidden');
             requestAnimationFrame(() => {
@@ -359,24 +311,15 @@ import '../styles/global.css';
             toastTimer = setTimeout(() => {
                 toastIsland.classList.remove('opacity-100', 'translate-y-0');
                 toastIsland.classList.add('opacity-0', 'translate-y-1');
-                
-                setTimeout(() => {
-                    toastIsland.classList.add('hidden');
-                }, 300);
+                setTimeout(() => toastIsland.classList.add('hidden'), 300);
             }, 2500);
         }
 
         if (btnSyncGas) {
             btnSyncGas.addEventListener('click', async () => {
-                if (iconSync) {
-                    iconSync.classList.add('animate-spin', 'text-indigo-600');
-                }
-
+                if (iconSync) iconSync.classList.add('animate-spin', 'text-indigo-600');
                 try {
-                    const response = await fetch(GAS_WEB_APP_URL, {
-                        method: 'POST'
-                    });
-                    
+                    const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
                     if (response.ok) {
                         showDynamicToast("sync spreadsheet berhasil", true);
                     } else {
@@ -386,9 +329,7 @@ import '../styles/global.css';
                     console.error("Gagal memanggil GAS:", err);
                     showDynamicToast("sync spreadsheet gagal", false);
                 } finally {
-                    if (iconSync) {
-                        iconSync.classList.remove('animate-spin', 'text-indigo-600');
-                    }
+                    if (iconSync) iconSync.classList.remove('animate-spin', 'text-indigo-600');
                 }
             });
         }
