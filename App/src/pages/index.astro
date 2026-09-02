@@ -383,30 +383,38 @@ import '../styles/global.css';
             });
         }
 
-        // HANDLER INSTAN "LIHAT SEMUA" (SMART DETECT: PC/MOBILE)
+        // HANDLER INSTAN "LIHAT SEMUA" (SMART DETECT: PC/MOBILE/ANDROID/IOS)
         const btnLihatSemua = document.getElementById('btn-lihat-semua');
         if (btnLihatSemua) {
             btnLihatSemua.addEventListener('click', (e) => {
                 e.preventDefault();
                 const docId = "1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg";
-                const webUrl = `https://docs.google.com/spreadsheets/d/${docId}/edit#gid=962128336`;
+                const gid = "962128336";
+                const webUrl = `https://docs.google.com/spreadsheets/d/${docId}/edit#gid=${gid}`;
                 
-                // Deteksi apakah pengguna pakai HP/Tablet (Mobile/Android/iOS)
-                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const ua = navigator.userAgent;
+                const isAndroid = /Android/i.test(ua);
+                const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
-                if (isMobile) {
-                    // HP/Tablet: Langsung tembak ke Aplikasi Native Google Sheets + Fallback
-                    const appUrl = `googlesheets://docs.google.com/spreadsheets/d/${docId}`;
+                if (isAndroid) {
+                    // Android: Menggunakan Intent resmi Google Sheets
+                    // Memaksa OS membuka App Native Google Sheets, jika tidak ada/gagal baru ke browser web
+                    const intentUrl = `intent://docs.google.com/spreadsheets/d/${docId}/edit#Intent;scheme=https;package=com.google.android.apps.docs.editors.sheets;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+                    window.location.href = intentUrl;
+                } else if (isIOS) {
+                    // iOS: Format URL universal Google Sheets
+                    const iosUrl = `googledocs://docs.google.com/spreadsheets/d/${docId}`;
                     const start = Date.now();
-                    window.location.href = appUrl;
+                    window.location.href = iosUrl;
 
                     setTimeout(() => {
+                        // Jika aplikasi tidak terinstall / gagal dibuka dalam 500ms, buka via Web Browser
                         if (Date.now() - start < 1000) {
-                            window.open(webUrl, '_blank', 'noopener,noreferrer');
+                            window.location.href = webUrl;
                         }
                     }, 500);
                 } else {
-                    // Laptop/PC: Langsung buka tab baru di browser tanpa delay
+                    // Laptop / PC: Langsung buka tab baru di browser
                     window.open(webUrl, '_blank', 'noopener,noreferrer');
                 }
             });
