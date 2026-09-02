@@ -5,8 +5,6 @@
     MENGATASI KEBIASAAN IBU BUKA LEWAT RECENT APP
     MENGHAPUS JENDELA BARU PADA LINK LIHAT SEMUA
 
-    tambahkan logika percepatan instan + fallback Aplikasi Google Sheets untuk link "Lihat Semua"
-
 
     FILE: index.astro
     DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
@@ -120,7 +118,7 @@ import '../styles/global.css';
             <div class="flex justify-between items-center mb-1">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
                 
-                <!-- DIOPTIMALKAN INSTAN + DEEP LINK APP -->
+                <!-- DIOPTIMALKAN INSTAN + SMART DETECT MOBILE/PC -->
                 <a 
                     id="btn-lihat-semua"
                     href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit#gid=962128336" 
@@ -385,7 +383,7 @@ import '../styles/global.css';
             });
         }
 
-        // HANDLER INSTAN "LIHAT SEMUA" (MEMBUKA NATIVE APP GOOGLE SHEETS / FALLBACK BROWSER)
+        // HANDLER INSTAN "LIHAT SEMUA" (SMART DETECT: PC/MOBILE)
         const btnLihatSemua = document.getElementById('btn-lihat-semua');
         if (btnLihatSemua) {
             btnLihatSemua.addEventListener('click', (e) => {
@@ -393,19 +391,24 @@ import '../styles/global.css';
                 const docId = "1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg";
                 const webUrl = `https://docs.google.com/spreadsheets/d/${docId}/edit#gid=962128336`;
                 
-                // Custom Scheme Aplikasi Native Google Sheets (iOS & Android)
-                const appUrl = `googlesheets://docs.google.com/spreadsheets/d/${docId}`;
-                
-                const start = Date.now();
-                // 1. Eksekusi instan membuka Aplikasi Google Sheets
-                window.location.href = appUrl;
+                // Deteksi apakah pengguna pakai HP/Tablet (Mobile/Android/iOS)
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-                // 2. Fallback: Buka via browser jika Aplikasi Google Sheets tidak merespons dalam 500ms
-                setTimeout(() => {
-                    if (Date.now() - start < 1000) {
-                        window.open(webUrl, '_blank', 'noopener,noreferrer');
-                    }
-                }, 500);
+                if (isMobile) {
+                    // HP/Tablet: Langsung tembak ke Aplikasi Native Google Sheets + Fallback
+                    const appUrl = `googlesheets://docs.google.com/spreadsheets/d/${docId}`;
+                    const start = Date.now();
+                    window.location.href = appUrl;
+
+                    setTimeout(() => {
+                        if (Date.now() - start < 1000) {
+                            window.open(webUrl, '_blank', 'noopener,noreferrer');
+                        }
+                    }, 500);
+                } else {
+                    // Laptop/PC: Langsung buka tab baru di browser tanpa delay
+                    window.open(webUrl, '_blank', 'noopener,noreferrer');
+                }
             });
         }
     </script>
