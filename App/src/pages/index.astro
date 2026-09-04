@@ -5,7 +5,6 @@
     MENGATASI KEBIASAAN IBU BUKA LEWAT RECENT APP
     MENGHAPUS JENDELA BARU PADA LINK LIHAT SEMUA
 
-
     FILE: index.astro
     DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
 */
@@ -127,6 +126,12 @@ import '../styles/global.css';
                 </a>
             </div>
 
+            <!-- NOTIFIKASI SYNC SPREADSHEET DITAMBAHKAN DI SINI -->
+            <div id="sync-status-container" class="flex items-center space-x-1.5 mb-2 transition-all duration-300">
+                <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <span id="sync-status-text" class="text-[11px] font-medium text-emerald-600">Transaksi sudah sinkron dengan Spreadsheet</span>
+            </div>
+
             <div id="list-transaksi" class="space-y-2">
                 <p class="text-xs text-slate-400 text-center py-4">Memuat transaksi...</p>
             </div>
@@ -171,13 +176,31 @@ import '../styles/global.css';
         const elHeaderBulan = document.getElementById('header-bulan');
         if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
 
+        // FUNGSI UPDATE NOTIFIKASI SYNC LOKAL
+        function updateSyncStatusUI() {
+            const syncDot = document.getElementById('sync-status-dot');
+            const syncText = document.getElementById('sync-status-text');
+            if (!syncDot || !syncText) return;
+
+            const isUnsynced = localStorage.getItem('cashflow_sync_state') === 'unsynced';
+
+            if (isUnsynced) {
+                syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 flex-shrink-0 animate-ping';
+                syncText.className = 'text-[11px] font-medium text-amber-600';
+                syncText.innerText = 'Ada transaksi baru belum disinkron';
+            } else {
+                syncDot.className = 'w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0';
+                syncText.className = 'text-[11px] font-medium text-emerald-600';
+                syncText.innerText = 'Transaksi sudah sinkron dengan Spreadsheet';
+            }
+        }
+
+        // FUNGSI FORMAT RUPIAH AKURAT (Intl.NumberFormat)
         function formatRupiah(angka: number | null | undefined): string {
-            if (angka === null || angka === undefined) return 'Rp 0';
-            const strAngka = Math.round(Number(angka)).toString();
-            const reverse = strAngka.split('').reverse().join('');
-            const matchRibuan = reverse.match(/\d{1,3}/g);
-            const ribuan = matchRibuan ? matchRibuan.join('.').split('').reverse().join('') : '';
-            return 'Rp ' + ribuan;
+            if (angka === null || angka === undefined || isNaN(angka)) return 'Rp 0';
+            const absoluteValue = Math.abs(Number(angka));
+            const formatted = new Intl.NumberFormat('id-ID').format(absoluteValue);
+            return angka < 0 ? `-Rp ${formatted}` : `Rp ${formatted}`;
         }
 
         async function fetchSummary() {
@@ -209,7 +232,7 @@ import '../styles/global.css';
             if (sisaBulananEl) {
                 sisaBulananEl.classList.remove('text-indigo-600', 'text-emerald-600', 'text-rose-600');
                 if (sisaBulananVal < 0) {
-                    sisaBulananEl.innerText = '-Rp ' + formatRupiah(Math.abs(sisaBulananVal)).replace('Rp ', '');
+                    sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
                     sisaBulananEl.classList.add('text-rose-600');
                 } else {
                     sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
@@ -222,7 +245,7 @@ import '../styles/global.css';
             if (elSisaAkhir) {
                 elSisaAkhir.classList.remove('text-emerald-700', 'text-emerald-600', 'text-rose-600');
                 if (sisaAkhirVal < 0) {
-                    elSisaAkhir.innerText = '-Rp ' + formatRupiah(Math.abs(sisaAkhirVal)).replace('Rp ', '');
+                    elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
                     elSisaAkhir.classList.add('text-rose-600');
                 } else {
                     elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
@@ -281,15 +304,17 @@ import '../styles/global.css';
             }
         }
 
-        // Fetch awal
+        // Fetch awal & Cek UI Notif
         fetchSummary();
         fetchTransactions();
+        updateSyncStatusUI();
 
         // Auto-refresh data saat PWA dibuka kembali dari Recent Apps
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 fetchSummary();
                 fetchTransactions();
+                updateSyncStatusUI();
             }
         });
 
@@ -297,6 +322,7 @@ import '../styles/global.css';
         window.addEventListener('focus', () => {
             fetchSummary();
             fetchTransactions();
+            updateSyncStatusUI();
         });
 
         // Mencegah masalah cache BFCache saat tombol 'Back' ditekan
@@ -304,6 +330,7 @@ import '../styles/global.css';
             if (event.persisted) {
                 fetchSummary();
                 fetchTransactions();
+                updateSyncStatusUI();
             }
         });
 
@@ -367,6 +394,10 @@ import '../styles/global.css';
                 try {
                     const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
                     if (response.ok) {
+                        // SET STATUS JADI SYNCED
+                        localStorage.setItem('cashflow_sync_state', 'synced');
+                        updateSyncStatusUI();
+
                         showDynamicToast("sync spreadsheet berhasil", true);
                     } else {
                         showDynamicToast("sync spreadsheet gagal", false);
@@ -397,24 +428,19 @@ import '../styles/global.css';
                 const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
                 if (isAndroid) {
-                    // Android: Menggunakan Intent resmi Google Sheets
-                    // Memaksa OS membuka App Native Google Sheets, jika tidak ada/gagal baru ke browser web
                     const intentUrl = `intent://docs.google.com/spreadsheets/d/${docId}/edit#Intent;scheme=https;package=com.google.android.apps.docs.editors.sheets;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
                     window.location.href = intentUrl;
                 } else if (isIOS) {
-                    // iOS: Format URL universal Google Sheets
                     const iosUrl = `googledocs://docs.google.com/spreadsheets/d/${docId}`;
                     const start = Date.now();
                     window.location.href = iosUrl;
 
                     setTimeout(() => {
-                        // Jika aplikasi tidak terinstall / gagal dibuka dalam 500ms, buka via Web Browser
                         if (Date.now() - start < 1000) {
                             window.location.href = webUrl;
                         }
                     }, 500);
                 } else {
-                    // Laptop / PC: Langsung buka tab baru di browser
                     window.open(webUrl, '_blank', 'noopener,noreferrer');
                 }
             });
