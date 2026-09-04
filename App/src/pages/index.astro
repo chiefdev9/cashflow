@@ -1,7 +1,7 @@
 ---
 /*
 FILE: index.astro
-DESKRIPSI: Dashboard Cashflow Tanaejka (Notifikasi Sync Halus & Presisi Supabase)
+DESKRIPSI: Dashboard Cashflow Tanaejka (Notifikasi Sync Realtime & Multi-Device via Supabase)
 */
 
 import { Image } from 'astro:assets';
@@ -178,13 +178,24 @@ const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
 const elHeaderBulan = document.getElementById('header-bulan');
 if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
 
-// FUNGSI UPDATE NOTIFIKASI SYNC LOKAL
-function updateSyncStatusUI() {
+// FUNGSI UPDATE NOTIFIKASI SYNC REALTIME VIA SUPABASE
+async function updateSyncStatusUI() {
 const syncDot = document.getElementById('sync-status-dot');
 const syncText = document.getElementById('sync-status-text');
 if (!syncDot || !syncText) return;
 
-const isUnsynced = localStorage.getItem('cashflow_sync_state') === 'unsynced';
+// Cek langsung ke database Supabase apakah ada transaksi yang is_synced = false
+const { count, error } = await supabase
+.from('transaksi')
+.select('*', { count: 'exact', head: true })
+.eq('is_synced', false);
+
+if (error) {
+console.error('Gagal mengecek status sync:', error);
+return;
+}
+
+const isUnsynced = count && count > 0;
 
 if (isUnsynced) {
 // MENGGUNAKAN ANIMASI SLOW-PULSE (KEDIPAN LEMBUT 2 DETIK)
@@ -343,6 +354,7 @@ supabase
 .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
 fetchTransactions();
 fetchSummary();
+updateSyncStatusUI(); // Otomatis cek & update status sync realtime saat ada transaksi baru/diubah
 })
 .subscribe();
 
@@ -388,9 +400,13 @@ if (iconSync) iconSync.classList.add('animate-spin', 'text-indigo-600');
 try {
 const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
 if (response.ok) {
-localStorage.setItem('cashflow_sync_state', 'synced');
-updateSyncStatusUI();
+// Update semua transaksi yang belum disinkron menjadi true di database Supabase
+await supabase
+.from('transaksi')
+.update({ is_synced: true })
+.eq('is_synced', false);
 
+await updateSyncStatusUI();
 showDynamicToast("sync spreadsheet berhasil", true);
 } else {
 showDynamicToast("sync spreadsheet gagal", false);
