@@ -1,13 +1,13 @@
----
-/*
-SI IBU SOK NEKEN TOMBOL KEMBALI BAE AMPUNN
-TOMBOL SYNC GAS SAAT BERJALAN TIDAK DAPAT DI TEKAN SAMPAI PROSES SELESAI
-MENGATASI KEBIASAAN IBU BUKA LEWAT RECENT APP
-MENGHAPUS JENDELA BARU PADA LINK LIHAT SEMUA
+"--- 
+/* 
+    SI IBU SOK NEKEN TOMBOL KEMBALI BAE AMPUNN
+    TOMBOL SYNC GAS SAAT BERJALAN TIDAK DAPAT DI TEKAN SAMPAI PROSES SELESAI
+    MENGATASI KEBIASAAN IBU BUKA LEWAT RECENT APP
+    MENGHAPUS JENDELA BARU PADA LINK LIHAT SEMUA
 
 
-FILE: index.astro
-DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
+    FILE: index.astro
+    DESKRIPSI: Dashboard Cashflow Tanaejka (Presisi dengan Trigger PostgreSQL Supabase).
 */
 
 import { Image } from 'astro:assets';
@@ -15,436 +15,410 @@ import '../styles/global.css';
 ---
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang=""id"">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"">
+    
+    <!-- Optimasi Koneksi Cepat ke Google Docs -->
+    <link rel=""dns-prefetch"" href=""https://docs.google.com"">
+    <link rel=""preconnect"" href=""https://docs.google.com"" crossorigin>
 
-<!-- Optimasi Koneksi Cepat ke Google Docs -->
-<link rel="dns-prefetch" href="https://docs.google.com">
-<link rel="preconnect" href="https://docs.google.com" crossorigin>
+    <link rel=""manifest"" href=""/site.webmanifest"" />
+    <link href=""https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"" rel=""stylesheet"">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 
-<link rel="manifest" href="/site.webmanifest" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-body { font-family: 'Inter', sans-serif; }
-</style>
-
-<title>Cashflow Tanaejka</title>
-<meta name="title" content="Cashflow Tanaejka" />
-<meta name="description" content="Cashflow summary - evaluate here for a brighter future" />
+    <title>Cashflow Tanaejka</title>
+    <meta name=""title"" content=""Cashflow Tanaejka"" />
+    <meta name=""description"" content=""Cashflow summary - evaluate here for a brighter future"" />
 </head>
-<body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
+<body class=""bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden"">
 
-<div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
+    <div class=""w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200"">
 
-<!-- HEADER / SALDO -->
-<header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
-<div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
-<Image
-src="/bg.jpg"
-alt="Aksen Vektor Header"
-width={800}
-height={600}
-class="w-full h-full object-cover scale-125 transform"
-/>
-</div>
+        <!-- HEADER / SALDO -->
+        <header class=""bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10"">
+            <div class=""absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center"">
+                <Image 
+                    src=""/bg.jpg"" 
+                    alt=""Aksen Vektor Header"" 
+                    width={800}
+                    height={600}
+                    class=""w-full h-full object-cover scale-125 transform""
+                />
+            </div>
 
-<div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
-<div class="flex items-center space-x-2.5">
-<div class="w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 overflow-hidden">
-<Image
-src="/rp.jpg"
-alt="Foto Profil ST"
-width={36}
-height={36}
-class="w-full h-full object-cover"
-/>
-</div>
-<div>
-<p class="text-[10px] text-slate-500 font-medium leading-none">Cashflow Tanaejka</p>
-<h2 id="header-bulan" class="text-xs font-bold text-slate-800 mt-0.5">Memuat...</h2>
-</div>
-</div>
-
-<div class="flex items-center space-x-2">
-<!-- DYNAMIC ISLAND TOAST (NOTIFIKASI MELAYANG) -->
-<div id="toast-island" class="hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5">
-<span id="toast-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square"></span>
-<span id="toast-message" class="whitespace-nowrap tracking-tight">sync spreadsheet berhasil</span>
-</div>
-
-<button id="btn-sync-gas" title="Tarik Data Supabase ke Google Sheet" class="w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-xs active:scale-95 transition cursor-pointer hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">
-<svg id="icon-sync" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-</svg>
-</button>
-</div>
-</div>
-
-<div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-3 rounded-2xl shadow-xs relative z-10 space-y-2">
-<div class="grid grid-cols-3 gap-1">
-<div>
-<span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Perputaran</span>
-<h2 id="val-perputaran" class="text-xs font-bold text-slate-900 mt-0.5 tracking-tight">Memuat...</h2>
-</div>
-<div class="text-center px-1 border-x border-slate-200/60">
-<span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Sisa Bulanan</span>
-<h2 id="val-sisa-bulanan" class="text-xs font-bold text-emerald-700 mt-0.5 tracking-tight">Memuat...</h2>
-</div>
-<div class="text-right pl-1">
-<span class="text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate">Saldo Akhir</span>
-<h2 id="val-sisa-akhir" class="text-xs font-bold text-emerald-700 mt-0.5 tracking-tight">Memuat...</h2>
-</div>
-</div>
-
-<div class="border-t border-slate-200/60"></div>
-
-<div class="grid grid-cols-2 gap-2">
-<div class="bg-slate-50/80 p-1.5 rounded-xl border border-slate-200/60">
-<p class="text-[9px] text-slate-400 font-medium leading-none">Pemasukan (In)</p>
-<p id="val-pemasukan" class="text-xs font-bold text-emerald-600 mt-0.5">Memuat...</p>
-</div>
-<div class="bg-slate-50/80 p-1.5 rounded-xl border border-slate-200/60">
-<p class="text-[9px] text-slate-400 font-medium leading-none">Pengeluaran (Out)</p>
-<p id="val-pengeluaran" class="text-xs font-bold text-rose-600 mt-0.5">Memuat...</p>
-</div>
-</div>
-</div>
-</header>
-
-<!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
-<main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
-<div class="flex justify-between items-center mb-1">
-<h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
-
-<!-- DIOPTIMALKAN INSTAN + SMART DETECT MOBILE/PC -->
-<a
-id="btn-lihat-semua"
-href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit#gid=962128336"
-class="text-xs text-indigo-600 font-medium cursor-pointer inline-block transition-opacity active:opacity-50 select-none touch-manipulation">
-Lihat Semua
-</a>
-</div>
-
-<!-- INDIKATOR STATUS PERMANEN (NOTIFIKASI KONDISI SYNC) -->
-<div id="status-sync-bar" class="flex items-center space-x-1.5 text-[10px] font-medium py-0.5">
-<span id="dot-sync-status" class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
-<span id="text-sync-status" class="text-emerald-700">Transaksi sudah sinkron dengan Spreadsheet</span>
-</div>
-
-<div id="list-transaksi" class="space-y-2">
-<p class="text-xs text-slate-400 text-center py-4">Memuat transaksi...</p>
-</div>
-</main>
-
-<!-- FLOATING ACTION BUTTON -->
-<div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-<a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
-<span class="text-base font-bold">-</span>
-<span class="text-xs">Keluar (Out)</span>
-</a>
-<a href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
-<span class="text-base font-bold">+</span>
-<span class="text-xs">Masuk (In)</span>
-</a>
-</div>
-
-</div>
-
-<!-- SCRIPT REALTIME SUPABASE -->
-<script>
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
-const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF1sqp_AV8xjAYNQk7u0qEpbLHeerfzCZ3IivMNhMrEsx49kEIiLXVkg/exec";
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-const now = new Date();
-const monthIndex = now.getMonth();
-const year = now.getFullYear();
-
-// Singkatan bulan DISESUAIKAN PERSIS dengan nilai string yang dihasilkan Trigger SQL Supabase
-const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
-const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-const TARGET_BULAN = shortMonths[monthIndex];
-const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
-
-const elHeaderBulan = document.getElementById('header-bulan');
-if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
-
-// ==========================================
-// ELEMEN NOTIFIKASI & INDIKATOR STATUS
-// ==========================================
-const elDotSyncStatus = document.getElementById('dot-sync-status');
-const elTextSyncStatus = document.getElementById('text-sync-status');
-
-const toastIsland = document.getElementById('toast-island');
-const toastMessage = document.getElementById('toast-message');
-const toastDot = document.getElementById('toast-status-dot');
-
-let toastTimer: ReturnType<typeof setTimeout> | null = null;
-let toastHideTimer: ReturnType<typeof setTimeout> | null = null;
-let isSyncing = false; // Guard state untuk cegah panggilan bertubi-tubi
-
-/**
- * MENGATASI NOTIFIKASI PERMANEN (STATUS SYNC)
- */
-function setSyncStatus(isSynced: boolean) {
-    if (!elDotSyncStatus || !elTextSyncStatus) return;
-
-    if (isSynced) {
-        elDotSyncStatus.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0';
-        elTextSyncStatus.className = 'text-emerald-700 font-medium';
-        elTextSyncStatus.innerText = 'Transaksi sudah sinkron dengan Spreadsheet';
-        localStorage.setItem('cashflow_sync_state', 'synced');
-    } else {
-        elDotSyncStatus.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 animate-pulse';
-        elTextSyncStatus.className = 'text-amber-600 font-semibold';
-        elTextSyncStatus.innerText = 'Transaksi belum disinkronkan';
-        localStorage.setItem('cashflow_sync_state', 'unsynced');
-    }
-}
-
-/**
- * MENGATASI TOAST ISLAND (MENGHINDARI GLITCH / TUMPANG TINDIH ANIMASI)
- */
-function showDynamicToast(msg: string, isSuccess: boolean) {
-    if (!toastIsland || !toastMessage || !toastDot) return;
-
-    // Bersihkan semua timer aktif agar animasi tidak bentrok jika ditekan cepat
-    if (toastTimer) clearTimeout(toastTimer);
-    if (toastHideTimer) clearTimeout(toastHideTimer);
-
-    toastMessage.innerText = msg;
-    toastDot.className = isSuccess
-        ? 'w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square animate-pulse'
-        : 'w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 aspect-square animate-pulse';
-
-    // Reset posisi awal untuk animasi yang mulus
-    toastIsland.classList.remove('hidden');
-
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            toastIsland.classList.remove('opacity-0', 'translate-y-1');
-            toastIsland.classList.add('opacity-100', 'translate-y-0');
-        });
-    });
-
-    // Sembunyikan otomatis
-    toastTimer = setTimeout(() => {
-        toastIsland.classList.remove('opacity-100', 'translate-y-0');
-        toastIsland.classList.add('opacity-0', 'translate-y-1');
-
-        toastHideTimer = setTimeout(() => {
-            toastIsland.classList.add('hidden');
-        }, 300); // Sesuai dengan duration-300 Tailwind
-    }, 2500);
-}
-
-// Cek Status Notifikasi Awal saat Aplikasi Dibuka
-const savedSyncState = localStorage.getItem('cashflow_sync_state');
-setSyncStatus(savedSyncState !== 'unsynced');
-
-// Helper Format Rupiah
-function formatRupiah(angka: number | null | undefined): string {
-    if (angka === null || angka === undefined || isNaN(angka)) return 'Rp 0';
-    const isNegative = angka < 0;
-    const strAngka = Math.round(Math.abs(Number(angka))).toString();
-    const reverse = strAngka.split('').reverse().join('');
-    const matchRibuan = reverse.match(/\d{1,3}/g);
-    const ribuan = matchRibuan ? matchRibuan.join('.').split('').reverse().join('') : '0';
-    const formatted = ribuan.split('').reverse().join('');
-    return isNegative ? `-Rp ${formatted}` : `Rp ${formatted}`;
-}
-
-async function fetchSummary() {
-    const { data, error } = await supabase
-        .from('summary')
-        .select('*')
-        .eq('Bulan', TARGET_BULAN)
-        .maybeSingle();
-
-    if (error) console.error('Gagal memuat data ringkasan:', error);
-
-    const summaryData = data || {
-        Perputaran: 0,
-        Sisa_Bulanan: 0,
-        Sisa_Akhir: 0,
-        Pemasukan: 0,
-        Pengeluaran: 0
-    };
-
-    const elPerputaran = document.getElementById('val-perputaran');
-    if (elPerputaran) elPerputaran.innerText = formatRupiah(summaryData.Perputaran);
-
-    const sisaBulananEl = document.getElementById('val-sisa-bulanan');
-    let sisaBulananVal = Number(summaryData.Sisa_Bulanan) || 0;
-    if (sisaBulananEl) {
-        sisaBulananEl.classList.remove('text-emerald-600', 'text-rose-600');
-        sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
-        sisaBulananEl.classList.add(sisaBulananVal < 0 ? 'text-rose-600' : 'text-emerald-600');
-    }
-
-    const elSisaAkhir = document.getElementById('val-sisa-akhir');
-    let sisaAkhirVal = Number(summaryData.Sisa_Akhir) || 0;
-    if (elSisaAkhir) {
-        elSisaAkhir.classList.remove('text-emerald-700', 'text-emerald-600', 'text-rose-600');
-        elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
-        elSisaAkhir.classList.add(sisaAkhirVal < 0 ? 'text-rose-600' : 'text-emerald-600');
-    }
-
-    const elPemasukan = document.getElementById('val-pemasukan');
-    if (elPemasukan) elPemasukan.innerText = formatRupiah(summaryData.Pemasukan);
-
-    const elPengeluaran = document.getElementById('val-pengeluaran');
-    if (elPengeluaran) elPengeluaran.innerText = formatRupiah(summaryData.Pengeluaran);
-}
-
-async function fetchTransactions() {
-    const container = document.getElementById('list-transaksi');
-    if (!container) return;
-
-    const { data, error } = await supabase
-        .from('transaksi')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(4);
-
-    if (error) {
-        console.error('Gagal memuat transaksi:', error);
-        container.innerHTML = `<p class="text-xs text-rose-500 text-center py-4">Gagal memuat transaksi</p>`;
-        return;
-    }
-
-    if (data && data.length > 0) {
-        container.innerHTML = data.map(item => {
-            const isIn = item.jenis === 'In';
-            const sign = isIn ? '+' : '-';
-            const bgClass = isIn ? 'bg-emerald-50' : 'bg-rose-50';
-            const textClass = isIn ? 'text-emerald-600' : 'text-rose-600';
-            const nominal = `${sign} ${formatRupiah(item.angka)}`;
-
-            return `
-                <div class="bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 rounded-xl ${bgClass} ${textClass} flex items-center justify-center font-bold text-base">
-                            ${sign}
-                        </div>
-                        <div>
-                            <p class="text-xs font-semibold text-slate-800">${item.catatan || '-'}</p>
-                            <p class="text-[10px] text-slate-400">${item.waktu || ''} • ${item.kategori || '-'}</p>
-                        </div>
+            <div class=""flex justify-between items-center mb-3 sm:mb-5 relative z-10"">
+                <div class=""flex items-center space-x-2.5"">
+                    <div class=""w-9 h-9 rounded-full bg-slate-100/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 overflow-hidden"">
+                        <Image 
+                            src=""/rp.jpg"" 
+                            alt=""Foto Profil ST"" 
+                            width={36} 
+                            height={36} 
+                            class=""w-full h-full object-cover"" 
+                        />
                     </div>
-                    <span class="text-xs font-bold ${textClass}">${nominal}</span>
+                    <div>
+                        <p class=""text-[10px] text-slate-500 font-medium leading-none"">Cashflow Tanaejka</p>
+                        <h2 id=""header-bulan"" class=""text-xs font-bold text-slate-800 mt-0.5"">Memuat...</h2>
+                    </div>
                 </div>
-            `;
-        }).join('');
-    } else {
-        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada transaksi</p>`;
-    }
-}
 
-// Fetch awal
-fetchSummary();
-fetchTransactions();
+                <div class=""flex items-center space-x-2"">
+                    <div id=""toast-island"" class=""hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5"">
+                        <span id=""toast-status-dot"" class=""w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square""></span>
+                        <span id=""toast-message"" class=""whitespace-nowrap tracking-tight"">sync spreadsheet berhasil</span>
+                    </div>
 
-// Auto-refresh data saat PWA dibuka kembali dari Recent Apps / Back Button
-const refreshAll = () => {
-    fetchSummary();
-    fetchTransactions();
-};
+                    <button id=""btn-sync-gas"" title=""Tarik Data Supabase ke Google Sheet"" class=""w-8 h-8 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 shadow-xs active:scale-95 transition cursor-pointer hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"">
+                        <svg id=""icon-sync"" xmlns=""http://www.w3.org/2000/svg"" class=""h-4 w-4 transition-transform duration-300"" fill=""none"" viewBox=""0 0 24 24"" stroke=""currentColor"">
+                            <path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""2"" d=""M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') refreshAll();
-});
-window.addEventListener('focus', refreshAll);
-window.addEventListener('pageshow', (event) => {
-    if (event.persisted) refreshAll();
-});
+            <div class=""bg-white/90 backdrop-blur-md border border-slate-200/80 p-3 rounded-2xl shadow-xs relative z-10 space-y-2"">
+                <div class=""grid grid-cols-3 gap-1"">
+                    <div>
+                        <span class=""text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate"">Perputaran</span>
+                        <h2 id=""val-perputaran"" class=""text-xs font-bold text-slate-900 mt-0.5 tracking-tight"">Memuat...</h2>
+                    </div>
+                    <div class=""text-center px-1 border-x border-slate-200/60"">
+                        <span class=""text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate"">Sisa Bulanan</span>
+                        <h2 id=""val-sisa-bulanan"" class=""text-xs font-bold text-emerald-700 mt-0.5 tracking-tight"">Memuat...</h2>
+                    </div>
+                    <div class=""text-right pl-1"">
+                        <span class=""text-[8px] text-slate-400 uppercase tracking-wider font-semibold block truncate"">Saldo Akhir</span>
+                        <h2 id=""val-sisa-akhir"" class=""text-xs font-bold text-emerald-700 mt-0.5 tracking-tight"">Memuat...</h2>
+                    </div>
+                </div>
 
-// Realtime Subscriptions
-supabase
-    .channel('public:summary')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, fetchSummary)
-    .subscribe();
+                <div class=""border-t border-slate-200/60""></div>
 
-supabase
-    .channel('public:transaksi')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
-        fetchTransactions();
-        fetchSummary();
-        // Otomatis ubah notifikasi status permanen jadi KUNING saat ada transaksi baru masuk
-        setSyncStatus(false);
-    })
-    .subscribe();
+                <div class=""grid grid-cols-2 gap-2"">
+                    <div class=""bg-slate-50/80 p-1.5 rounded-xl border border-slate-200/60"">
+                        <p class=""text-[9px] text-slate-400 font-medium leading-none"">Pemasukan (In)</p>
+                        <p id=""val-pemasukan"" class=""text-xs font-bold text-emerald-600 mt-0.5"">Memuat...</p>
+                    </div>
+                    <div class=""bg-slate-50/80 p-1.5 rounded-xl border border-slate-200/60"">
+                        <p class=""text-[9px] text-slate-400 font-medium leading-none"">Pengeluaran (Out)</p>
+                        <p id=""val-pengeluaran"" class=""text-xs font-bold text-rose-600 mt-0.5"">Memuat...</p>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-// Sync GAS & Toast Trigger
-const btnSyncGas = document.getElementById('btn-sync-gas') as HTMLButtonElement | null;
-const iconSync = document.getElementById('icon-sync');
+        <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
+        <main class=""flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48"">
+            <div class=""flex justify-between items-center mb-1"">
+                <h2 class=""text-xs font-bold uppercase tracking-wider text-slate-400"">Transaksi Terbaru</h2>
+                
+                <!-- DIOPTIMALKAN INSTAN + SMART DETECT MOBILE/PC -->
+                <a 
+                    id=""btn-lihat-semua""
+                    href=""https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit#gid=962128336"" 
+                    class=""text-xs text-indigo-600 font-medium cursor-pointer inline-block transition-opacity active:opacity-50 select-none touch-manipulation"">
+                    Lihat Semua
+                </a>
+            </div>
 
-if (btnSyncGas) {
-    btnSyncGas.addEventListener('click', async () => {
-        if (isSyncing) return;
+            <div id=""list-transaksi"" class=""space-y-2"">
+                <p class=""text-xs text-slate-400 text-center py-4"">Memuat transaksi...</p>
+            </div>
+        </main>
 
-        isSyncing = true;
-        btnSyncGas.disabled = true;
-        if (iconSync) iconSync.classList.add('animate-spin', 'text-indigo-600');
+        <!-- FLOATING ACTION BUTTON -->
+        <div class=""absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30"">
+            <a href=""/out"" class=""pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer"">
+                <span class=""text-base font-bold"">-</span>
+                <span class=""text-xs"">Keluar (Out)</span>
+            </a>
+            <a href=""/in"" class=""pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer"">
+                <span class=""text-base font-bold"">+</span>
+                <span class=""text-xs"">Masuk (In)</span>
+            </a>
+        </div>
 
-        try {
-            const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
-            if (response.ok) {
-                showDynamicToast("sync spreadsheet berhasil", true);
-                setSyncStatus(true);
-            } else {
-                showDynamicToast("sync spreadsheet gagal", false);
+    </div>
+
+    <!-- SCRIPT REALTIME SUPABASE -->
+    <script>
+        import { createClient } from '@supabase/supabase-js';
+
+        const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
+        const GAS_WEB_APP_URL = ""https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF1sqp_AV8xjAYNQk7u0qEpbLHeerfzCZ3IivMNhMrEsx49kEIiLXVkg/exec"";
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        const now = new Date();
+        const monthIndex = now.getMonth(); 
+        const year = now.getFullYear();
+
+        // Singkatan bulan DISESUAIKAN PERSIS dengan nilai string yang dihasilkan Trigger SQL Supabase
+        const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agust', 'Sept', 'Okt', 'Nov', 'Des'];
+        const fullMonths = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        // Nama bulan untuk pencarian di DB ('Agust', 'Sept', dst)
+        const TARGET_BULAN = shortMonths[monthIndex]; 
+        const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
+
+        const elHeaderBulan = document.getElementById('header-bulan');
+        if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
+
+        function formatRupiah(angka: number | null | undefined): string {
+            if (angka === null || angka === undefined) return 'Rp 0';
+            const strAngka = Math.round(Number(angka)).toString();
+            const reverse = strAngka.split('').reverse().join('');
+            const matchRibuan = reverse.match(/\d{1,3}/g);
+            const ribuan = matchRibuan ? matchRibuan.join('.').split('').reverse().join('') : '';
+            return 'Rp ' + ribuan;
+        }
+
+        async function fetchSummary() {
+            // Mengambil baris bulan berjalan (misal: 'Sept')
+            const { data, error } = await supabase
+                .from('summary')
+                .select('*')
+                .eq('Bulan', TARGET_BULAN)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Gagal memuat data ringkasan:', error);
             }
-        } catch (err) {
-            console.error("Gagal memanggil GAS:", err);
-            showDynamicToast("sync spreadsheet gagal", false);
-        } finally {
-            isSyncing = false;
-            btnSyncGas.disabled = false;
-            if (iconSync) iconSync.classList.remove('animate-spin', 'text-indigo-600');
-        }
-    });
-}
 
-// HANDLER INSTAN "LIHAT SEMUA" (SMART DETECT: PC/MOBILE/ANDROID/IOS)
-const btnLihatSemua = document.getElementById('btn-lihat-semua');
-if (btnLihatSemua) {
-    btnLihatSemua.addEventListener('click', (e) => {
-        e.preventDefault();
-        const docId = "1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg";
-        const gid = "962128336";
-        const webUrl = `https://docs.google.com/spreadsheets/d/${docId}/edit#gid=${gid}`;
+            // Jika belum ada data transaksi sama sekali di bulan baru, defaultkan ke Rp 0
+            const summaryData = data || {
+                Perputaran: 0,
+                Sisa_Bulanan: 0,
+                Sisa_Akhir: 0,
+                Pemasukan: 0,
+                Pengeluaran: 0
+            };
 
-        const ua = navigator.userAgent;
-        const isAndroid = /Android/i.test(ua);
-        const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-        if (isAndroid) {
-            const intentUrl = `intent://docs.google.com/spreadsheets/d/${docId}/edit#Intent;scheme=https;package=com.google.android.apps.docs.editors.sheets;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
-            window.location.href = intentUrl;
-        } else if (isIOS) {
-            const iosUrl = `googledocs://docs.google.com/spreadsheets/d/${docId}`;
-            const start = Date.now();
-            window.location.href = iosUrl;
-
-            setTimeout(() => {
-                if (Date.now() - start < 1000) {
-                    window.location.href = webUrl;
+            const elPerputaran = document.getElementById('val-perputaran');
+            if (elPerputaran) elPerputaran.innerText = formatRupiah(summaryData.Perputaran);
+            
+            const sisaBulananEl = document.getElementById('val-sisa-bulanan');
+            let sisaBulananVal = Number(summaryData.Sisa_Bulanan) || 0;
+            if (sisaBulananEl) {
+                sisaBulananEl.classList.remove('text-indigo-600', 'text-emerald-600', 'text-rose-600');
+                if (sisaBulananVal < 0) {
+                    sisaBulananEl.innerText = '-Rp ' + formatRupiah(Math.abs(sisaBulananVal)).replace('Rp ', '');
+                    sisaBulananEl.classList.add('text-rose-600');
+                } else {
+                    sisaBulananEl.innerText = formatRupiah(sisaBulananVal);
+                    sisaBulananEl.classList.add('text-emerald-600');
                 }
-            }, 500);
-        } else {
-            window.open(webUrl, '_blank', 'noopener,noreferrer');
+            }
+
+            const elSisaAkhir = document.getElementById('val-sisa-akhir');
+            let sisaAkhirVal = Number(summaryData.Sisa_Akhir) || 0;
+            if (elSisaAkhir) {
+                elSisaAkhir.classList.remove('text-emerald-700', 'text-emerald-600', 'text-rose-600');
+                if (sisaAkhirVal < 0) {
+                    elSisaAkhir.innerText = '-Rp ' + formatRupiah(Math.abs(sisaAkhirVal)).replace('Rp ', '');
+                    elSisaAkhir.classList.add('text-rose-600');
+                } else {
+                    elSisaAkhir.innerText = formatRupiah(sisaAkhirVal);
+                    elSisaAkhir.classList.add('text-emerald-600');
+                }
+            }
+
+            const elPemasukan = document.getElementById('val-pemasukan');
+            if (elPemasukan) elPemasukan.innerText = formatRupiah(summaryData.Pemasukan);
+
+            const elPengeluaran = document.getElementById('val-pengeluaran');
+            if (elPengeluaran) elPengeluaran.innerText = formatRupiah(summaryData.Pengeluaran);
         }
-    });
-}
-</script>
+
+        async function fetchTransactions() {
+            const container = document.getElementById('list-transaksi');
+            if (!container) return;
+
+            const { data, error } = await supabase
+                .from('transaksi')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(4);
+
+            if (error) {
+                console.error('Gagal memuat transaksi:', error);
+                container.innerHTML = `<p class=""text-xs text-rose-500 text-center py-4"">Gagal memuat transaksi</p>`;
+                return;
+            }
+
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(item => {
+                    const isIn = item.jenis === 'In';
+                    const sign = isIn ? '+' : '-';
+                    const bgClass = isIn ? 'bg-emerald-50' : 'bg-rose-50';
+                    const textClass = isIn ? 'text-emerald-600' : 'text-rose-600';
+                    const nominal = `${sign} ${formatRupiah(item.angka)}`;
+
+                    return `
+                        <div class=""bg-white p-3 rounded-2xl shadow-xs border border-slate-100 flex items-center justify-between"">
+                            <div class=""flex items-center space-x-3"">
+                                <div class=""w-9 h-9 rounded-xl ${bgClass} ${textClass} flex items-center justify-center font-bold text-base"">
+                                    ${sign}
+                                </div>
+                                <div>
+                                    <p class=""text-xs font-semibold text-slate-800"">${item.catatan || '-'}</p>
+                                    <p class=""text-[10px] text-slate-400"">${item.waktu || ''} • ${item.kategori || '-'}</p>
+                                </div>
+                            </div>
+                            <span class=""text-xs font-bold ${textClass}"">${nominal}</span>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = `<p class=""text-xs text-slate-400 text-center py-4"">Belum ada transaksi</p>`;
+            }
+        }
+
+        // Fetch awal
+        fetchSummary();
+        fetchTransactions();
+
+        // Auto-refresh data saat PWA dibuka kembali dari Recent Apps
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                fetchSummary();
+                fetchTransactions();
+            }
+        });
+
+        // Backup refresh saat window mendapatkan fokus kembali
+        window.addEventListener('focus', () => {
+            fetchSummary();
+            fetchTransactions();
+        });
+
+        // Mencegah masalah cache BFCache saat tombol 'Back' ditekan
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                fetchSummary();
+                fetchTransactions();
+            }
+        });
+
+        // Realtime Subscription
+        supabase
+            .channel('public:summary')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'summary' }, () => {
+                fetchSummary();
+            })
+            .subscribe();
+
+        supabase
+            .channel('public:transaksi')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
+                fetchTransactions();
+                fetchSummary();
+            })
+            .subscribe();
+
+        // Toast & Sync GAS
+        const btnSyncGas = document.getElementById('btn-sync-gas') as HTMLButtonElement | null;
+        const iconSync = document.getElementById('icon-sync');
+        const toastIsland = document.getElementById('toast-island');
+        const toastMessage = document.getElementById('toast-message');
+        const toastDot = document.getElementById('toast-status-dot');
+
+        let toastTimer: ReturnType<typeof setTimeout> | null = null;
+        let isSyncing = false; // Guard state untuk cegah panggilan bertubi-tubi
+
+        function showDynamicToast(msg: string, isSuccess: boolean) {
+            if (!toastIsland || !toastMessage || !toastDot) return;
+            if (toastTimer) clearTimeout(toastTimer);
+
+            toastMessage.innerText = msg;
+            toastDot.className = isSuccess 
+                ? 'w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square animate-pulse'
+                : 'w-2 h-2 rounded-full bg-rose-400 flex-shrink-0 aspect-square animate-pulse';
+
+            toastIsland.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                toastIsland.classList.remove('opacity-0', 'translate-y-1');
+                toastIsland.classList.add('opacity-100', 'translate-y-0');
+            });
+
+            toastTimer = setTimeout(() => {
+                toastIsland.classList.remove('opacity-100', 'translate-y-0');
+                toastIsland.classList.add('opacity-0', 'translate-y-1');
+                setTimeout(() => toastIsland.classList.add('hidden'), 300);
+            }, 2500);
+        }
+
+        if (btnSyncGas) {
+            btnSyncGas.addEventListener('click', async () => {
+                // Cegah eksekusi ganda jika sync sedang berjalan
+                if (isSyncing) return;
+
+                isSyncing = true;
+                btnSyncGas.disabled = true; // Nonaktifkan tombol secara native
+                if (iconSync) iconSync.classList.add('animate-spin', 'text-indigo-600');
+
+                try {
+                    const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
+                    if (response.ok) {
+                        showDynamicToast(""sync spreadsheet berhasil"", true);
+                    } else {
+                        showDynamicToast(""sync spreadsheet gagal"", false);
+                    }
+                } catch (err) {
+                    console.error(""Gagal memanggil GAS:"", err);
+                    showDynamicToast(""sync spreadsheet gagal"", false);
+                } finally {
+                    // Kembalikan keadaan tombol setelah selesai (baik sukses maupun gagal)
+                    isSyncing = false;
+                    btnSyncGas.disabled = false;
+                    if (iconSync) iconSync.classList.remove('animate-spin', 'text-indigo-600');
+                }
+            });
+        }
+
+        // HANDLER INSTAN ""LIHAT SEMUA"" (SMART DETECT: PC/MOBILE/ANDROID/IOS)
+        const btnLihatSemua = document.getElementById('btn-lihat-semua');
+        if (btnLihatSemua) {
+            btnLihatSemua.addEventListener('click', (e) => {
+                e.preventDefault();
+                const docId = ""1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg"";
+                const gid = ""962128336"";
+                const webUrl = `https://docs.google.com/spreadsheets/d/${docId}/edit#gid=${gid}`;
+                
+                const ua = navigator.userAgent;
+                const isAndroid = /Android/i.test(ua);
+                const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+                if (isAndroid) {
+                    // Android: Menggunakan Intent resmi Google Sheets
+                    // Memaksa OS membuka App Native Google Sheets, jika tidak ada/gagal baru ke browser web
+                    const intentUrl = `intent://docs.google.com/spreadsheets/d/${docId}/edit#Intent;scheme=https;package=com.google.android.apps.docs.editors.sheets;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+                    window.location.href = intentUrl;
+                } else if (isIOS) {
+                    // iOS: Format URL universal Google Sheets
+                    const iosUrl = `googledocs://docs.google.com/spreadsheets/d/${docId}`;
+                    const start = Date.now();
+                    window.location.href = iosUrl;
+
+                    setTimeout(() => {
+                        // Jika aplikasi tidak terinstall / gagal dibuka dalam 500ms, buka via Web Browser
+                        if (Date.now() - start < 1000) {
+                            window.location.href = webUrl;
+                        }
+                    }, 500);
+                } else {
+                    // Laptop / PC: Langsung buka tab baru di browser
+                    window.open(webUrl, '_blank', 'noopener,noreferrer');
+                }
+            });
+        }
+    </script>
 </body>
-</html>
+</html>"
