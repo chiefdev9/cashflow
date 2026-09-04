@@ -69,6 +69,7 @@ import '../styles/global.css';
                 </div>
 
                 <div class="flex items-center space-x-2">
+                    <!-- DYNAMIC ISLAND TOAST (DIPERTAHANKAN) -->
                     <div id="toast-island" class="hidden opacity-0 transform translate-y-1 transition-all duration-300 ease-out bg-slate-900/90 backdrop-blur-md text-white text-[10px] font-medium px-2.5 py-1 rounded-full shadow-lg border border-slate-700/50 flex items-center space-x-1.5">
                         <span id="toast-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 aspect-square"></span>
                         <span id="toast-message" class="whitespace-nowrap tracking-tight">sync spreadsheet berhasil</span>
@@ -127,6 +128,12 @@ import '../styles/global.css';
                 </a>
             </div>
 
+            <!-- INDIKATOR STATUS PERMANEN (SELALU TERLIHAT) -->
+            <div id="status-sync-bar" class="flex items-center space-x-1.5 text-[10px] font-medium py-0.5">
+                <span id="dot-sync-status" class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <span id="text-sync-status" class="text-emerald-700">Transaksi sudah sinkron dengan Spreadsheet</span>
+            </div>
+
             <div id="list-transaksi" class="space-y-2">
                 <p class="text-xs text-slate-400 text-center py-4">Memuat transaksi...</p>
             </div>
@@ -170,6 +177,35 @@ import '../styles/global.css';
 
         const elHeaderBulan = document.getElementById('header-bulan');
         if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
+
+        // ELEMEN STATUS SYNC PERMANEN
+        const elDotSyncStatus = document.getElementById('dot-sync-status');
+        const elTextSyncStatus = document.getElementById('text-sync-status');
+
+        // Helper untuk Mengubah Tampilan Notif Permanen
+        function setSyncStatus(isSynced: boolean) {
+            if (!elDotSyncStatus || !elTextSyncStatus) return;
+
+            if (isSynced) {
+                elDotSyncStatus.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0';
+                elTextSyncStatus.className = 'text-emerald-700 font-medium';
+                elTextSyncStatus.innerText = 'Transaksi sudah sinkron dengan Spreadsheet';
+                localStorage.setItem('cashflow_sync_state', 'synced');
+            } else {
+                elDotSyncStatus.className = 'w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0 animate-pulse';
+                elTextSyncStatus.className = 'text-amber-600 font-semibold';
+                elTextSyncStatus.innerText = 'Transaksi belum disinkronkan';
+                localStorage.setItem('cashflow_sync_state', 'unsynced');
+            }
+        }
+
+        // Cek Status Awal saat Pertama Kali Muat
+        const savedSyncState = localStorage.getItem('cashflow_sync_state');
+        if (savedSyncState === 'unsynced') {
+            setSyncStatus(false);
+        } else {
+            setSyncStatus(true);
+        }
 
         function formatRupiah(angka: number | null | undefined): string {
             if (angka === null || angka === undefined) return 'Rp 0';
@@ -320,6 +356,8 @@ import '../styles/global.css';
             .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
                 fetchTransactions();
                 fetchSummary();
+                // Saat ada data transaksi baru masuk/berubah, tandai bahwa data belum di-sync!
+                setSyncStatus(false);
             })
             .subscribe();
 
@@ -368,6 +406,8 @@ import '../styles/global.css';
                     const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
                     if (response.ok) {
                         showDynamicToast("sync spreadsheet berhasil", true);
+                        // Ubah status permanen menjadi SUDAH SINKRON
+                        setSyncStatus(true);
                     } else {
                         showDynamicToast("sync spreadsheet gagal", false);
                     }
