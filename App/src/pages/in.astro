@@ -59,8 +59,8 @@ import '../styles/global.css';
         </header>
 
         <!-- Main Form Content -->
-        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
-            <form id="formIn" class="space-y-3 sm:space-y-4">
+        <form id="formIn" class="flex-1 flex flex-col justify-between overflow-hidden relative">
+            <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
                 
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -126,18 +126,18 @@ import '../styles/global.css';
                         class="w-full text-xs text-slate-800 focus:outline-none bg-transparent placeholder-slate-300 resize-none font-medium"
                     ></textarea>
                 </div>
-            </form>
-        </main>
+            </main>
 
-        <!-- Tombol Simpan Pemasukan -->
-        <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
-            <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span id="btnText">Simpan Pemasukan</span>
-            </button>
-        </div>
+            <!-- Tombol Simpan Pemasukan ( Floating Bottom Di Dalam Form ) -->
+            <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
+                <button id="btnSimpan" type="submit" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span id="btnText">Simpan Pemasukan</span>
+                </button>
+            </div>
+        </form>
 
     </div>
 
@@ -155,8 +155,10 @@ import '../styles/global.css';
             window.location.replace(targetUrl);
         }
 
-        // PENGAMAN TOMBOL BACK ANDROID:
-        // Menangkap tombol back fisik dan mengarahkan kembali ke Dashboard secara bersih
+        // PENGAMAN TOMBOL BACK ANDROID / BROWSER
+        // Dorong state baru ke history stack saat halaman dimuat
+        history.pushState(null, '', window.location.href);
+
         window.addEventListener('popstate', () => {
             redirectCleanly('/');
         });
@@ -193,10 +195,11 @@ import '../styles/global.css';
             input.value = value;
         });
 
+        const formIn = document.getElementById('formIn') as HTMLFormElement | null;
         const btn = document.getElementById('btnSimpan') as HTMLButtonElement | null;
         const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
 
-        btn?.addEventListener('click', async () => {
+        const handleSave = async () => {
             if (!btn) return;
 
             const rawNominal = nominalEl ? Number(nominalEl.value.replace(/,/g, '')) : 0;
@@ -213,7 +216,7 @@ import '../styles/global.css';
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
             try {
-                // INSERT KE TABEL TRANSAKSI (Trigger Supabase meng-update tabel summary secara otomatis)
+                // INSERT KE TABEL TRANSAKSI
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
@@ -239,6 +242,12 @@ import '../styles/global.css';
                 if (btnText) btnText.innerText = 'Simpan Pemasukan';
                 btn.disabled = false;
             }
+        };
+
+        // Event listener saat form disubmit
+        formIn?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleSave();
         });
     </script>
 </body>
