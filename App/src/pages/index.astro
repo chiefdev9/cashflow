@@ -27,7 +27,15 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  width: 100%;
   overflow: hidden;
+  /* Mencegah pergeseran tata letak saat PWA dibuka */
+  overscroll-behavior: none;
+}
+
+/* Kunci posisi tombol relatif terhadap dasar viewport/safe area */
+.floating-action-container {
+  bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
 }
 
 /* Animasi kedip tenang/smooth untuk indikator unsynced */
@@ -44,9 +52,9 @@ html, body {
 <meta name="title" content="Cashflow Tanaejka" />
 <meta name="description" content="Cashflow summary - evaluate here for a brighter future" />
 </head>
-<body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
+<body class="bg-slate-100 text-slate-800 flex justify-center items-center h-full min-h-screen p-0 sm:p-4 overflow-hidden">
 
-<div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
+<div class="w-full sm:max-w-md h-full sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
 <!-- HEADER / SALDO -->
 <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
@@ -147,8 +155,8 @@ Lihat Semua
 </div>
 </main>
 
-<!-- FLOATING ACTION BUTTON (DIPERBAIKI DENGAN POSISI BOTTOM-28 PRESISI SAMAKAN DENGAN FORM IN/OUT) -->
-<div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
+<!-- FLOATING ACTION BUTTON (DIKUNCI DENGAN CLASS STABIL BERDASARKAN SAFE AREA) -->
+<div class="floating-action-container absolute left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
 <a id="btn-go-out" href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
 <span class="text-base font-bold">-</span>
 <span class="text-xs">Keluar (Out)</span>
@@ -198,12 +206,9 @@ redirectCleanly('/in');
 history.pushState(null, '', location.href);
 
 window.addEventListener('popstate', () => {
-// Jika dibuka sebagai aplikasi PWA / Home Screen Standalone
 if (window.matchMedia('(display-mode: standalone)').matches) {
-// Di PWA, menekan Back pada entry awal akan meminimalisir/menutup aplikasi
 window.close();
 } else {
-// Jika dibuka di browser biasa (Chrome), kembalikan ke state awal agar tidak pindah halaman
 history.pushState(null, '', location.href);
 }
 });
@@ -227,7 +232,6 @@ const syncDot = document.getElementById('sync-status-dot');
 const syncText = document.getElementById('sync-status-text');
 if (!syncDot || !syncText) return;
 
-// Cek langsung ke database Supabase apakah ada transaksi yang is_synced = false
 const { count, error } = await supabase
 .from('transaksi')
 .select('*', { count: 'exact', head: true })
@@ -241,7 +245,6 @@ return;
 const isUnsynced = count && count > 0;
 
 if (isUnsynced) {
-// MENGGUNAKAN ANIMASI SLOW-PULSE (KEDIPAN LEMBUT 2 DETIK)
 syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 flex-shrink-0 animate-slow-pulse';
 syncText.className = 'text-[11px] font-medium text-amber-600';
 syncText.innerText = "Don't forget to synchronize!";
@@ -252,7 +255,7 @@ syncText.innerText = 'Synchronization Successful!';
 }
 }
 
-// FUNGSI FORMAT RUPIAH AKURAT (Intl.NumberFormat)
+// FUNGSI FORMAT RUPIAH AKURAT
 function formatRupiah(angka: number | null | undefined): string {
 if (angka === null || angka === undefined || isNaN(angka)) return 'Rp 0';
 const absoluteValue = Math.abs(Number(angka));
@@ -397,7 +400,7 @@ supabase
 .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
 fetchTransactions();
 fetchSummary();
-updateSyncStatusUI(); // Otomatis cek & update status sync realtime saat ada transaksi baru/diubah
+updateSyncStatusUI();
 })
 .subscribe();
 
@@ -443,7 +446,6 @@ if (iconSync) iconSync.classList.add('animate-spin', 'text-indigo-600');
 try {
 const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
 if (response.ok) {
-// Update semua transaksi yang belum disinkron menjadi true di database Supabase
 await supabase
 .from('transaksi')
 .update({ is_synced: true })
