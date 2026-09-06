@@ -447,32 +447,36 @@ window.open(webUrl, '_blank', 'noopener,noreferrer');
 }
 
 // =======================================================
-// FIX: DOUBLE BACK KELUAR / MINIMIZE UNTUK PWA ANDROID
+// FIX TUNTAS: KUNCI HISTORY & FORCE MINIMIZE PWA ANDROID
 // =======================================================
-let lastBackPress = 0;
+let lastBackPressTime = 0;
 
-function handlePwaDoubleBack() {
-  // Sisipkan state ganda untuk mengunci history bawaan browser
-  window.history.pushState(null, '', window.location.href);
+function initPwaBackPrevention() {
+  // 1. Bersihkan seluruh tumpukan riwayat halaman sebelumnya agar tidak bisa diswipe back
+  window.history.replaceState({ page: 'root' }, '', window.location.href);
+  window.history.pushState({ page: 'root' }, '', window.location.href);
 
-  window.addEventListener('popstate', () => {
-    const now = Date.now();
-    const isDoubleTap = now - lastBackPress < 2000;
+  // 2. Tahan tombol Back agar tidak memicu navigasi
+  window.addEventListener('popstate', (e) => {
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastBackPressTime;
 
-    if (isDoubleTap) {
-      // Jika ditekan 2x berturut-turut, paksa mundur 2 langkah (keluar dari PWA ke launcher/background)
-      window.history.go(-2);
+    if (timeDiff < 2000) {
+      // Jika double back dalam 2 detik, kembalikan ke entry paling dasar
+      // PWA Standalone Android akan mengartikannya sebagai keluar/minimize app
+      window.history.go(-1);
     } else {
-      lastBackPress = now;
+      lastBackPressTime = currentTime;
       showDynamicToast("Tekan sekali lagi untuk keluar", false);
-      // Kunci kembali state history agar tidak berpindah ke halaman sebelumnya jika ditekan sekali lagi
-      window.history.pushState(null, '', window.location.href);
+      
+      // Kunci ulang state agar tidak bisa mundur
+      window.history.pushState({ page: 'root' }, '', window.location.href);
     }
   });
 }
 
-// Inisialisasi handler
-handlePwaDoubleBack();
+// Jalankan sistem pengunci history
+initPwaBackPrevention();
 </script>
 </body>
 </html>
