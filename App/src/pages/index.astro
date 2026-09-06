@@ -137,14 +137,14 @@ Lihat Semua
 </main>
 
 <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-<a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
+<button id="btn-nav-out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 cursor-pointer">
 <span class="text-base font-bold">-</span>
 <span class="text-xs">Keluar (Out)</span>
-</a>
-<a href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
+</button>
+<button id="btn-nav-in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 cursor-pointer">
 <span class="text-base font-bold">+</span>
 <span class="text-xs">Masuk (In)</span>
-</a>
+</button>
 </div>
 
 </div>
@@ -171,13 +171,28 @@ const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
 const elHeaderBulan = document.getElementById('header-bulan');
 if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
 
+// PENANGANAN NAVIGASI TANPA MENAMBAH HISTORY
+const btnNavOut = document.getElementById('btn-nav-out');
+const btnNavIn = document.getElementById('btn-nav-in');
+
+if (btnNavOut) {
+  btnNavOut.addEventListener('click', () => {
+    window.location.replace('/out');
+  });
+}
+
+if (btnNavIn) {
+  btnNavIn.addEventListener('click', () => {
+    window.location.replace('/in');
+  });
+}
+
 // FUNGSI UPDATE NOTIFIKASI SYNC REALTIME VIA SUPABASE
 async function updateSyncStatusUI() {
 const syncDot = document.getElementById('sync-status-dot');
 const syncText = document.getElementById('sync-status-text');
 if (!syncDot || !syncText) return;
 
-// Cek langsung ke database Supabase apakah ada transaksi yang is_synced = false
 const { count, error } = await supabase
 .from('transaksi')
 .select('*', { count: 'exact', head: true })
@@ -191,7 +206,6 @@ return;
 const isUnsynced = count && count > 0;
 
 if (isUnsynced) {
-// MENGGUNAKAN ANIMASI SLOW-PULSE (KEDIPAN LEMBUT 2 DETIK)
 syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 flex-shrink-0 animate-slow-pulse';
 syncText.className = 'text-[11px] font-medium text-amber-600';
 syncText.innerText = "Don't forget to synchronize!";
@@ -347,7 +361,7 @@ supabase
 .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
 fetchTransactions();
 fetchSummary();
-updateSyncStatusUI(); // Otomatis cek & update status sync realtime saat ada transaksi baru/diubah
+updateSyncStatusUI();
 })
 .subscribe();
 
@@ -393,7 +407,6 @@ if (iconSync) iconSync.classList.add('animate-spin', 'text-indigo-600');
 try {
 const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
 if (response.ok) {
-// Update semua transaksi yang belum disinkron menjadi true di database Supabase
 await supabase
 .from('transaksi')
 .update({ is_synced: true })
@@ -447,34 +460,31 @@ window.open(webUrl, '_blank', 'noopener,noreferrer');
 }
 
 // =========================================================================
-// SOLUSI DEFINITIF: TRAP & OVERRIDE SEGITIGA BACK BUTTON PWA ANDROID
+// SISTEM INTERCEPT BACK BUTTON ANDROID (STRICT OVERRIDE)
 // =========================================================================
 let lastBackPressTime = 0;
 
-function setupStrictDoubleBackHandler() {
-  // 1. Injeksi state dummy ke paling atas dan bawah agar browser terkunci
-  window.history.pushState({ pwa_guard: true }, '', window.location.href);
+function setupBackLock() {
+  // Push state awal agar browser mengunci posisi di halaman utama
+  window.history.pushState({ pwa_root: true }, "", window.location.href);
 
-  window.addEventListener('popstate', (e) => {
+  window.onpopstate = function () {
     const currentTime = Date.now();
     const timeDiff = currentTime - lastBackPressTime;
 
     if (timeDiff < 2000) {
-      // Jika ditekan 2 kali dalam 2 detik, lepas kunci history
-      // Ini akan memicu OS Android untuk langsung meminimalkan/keluar dari PWA
-      window.history.go(-2);
+      // Ditekan 2 kali dalam 2 detik -> Minimize / Keluar PWA
+      window.history.back();
     } else {
       lastBackPressTime = currentTime;
       showDynamicToast("Tekan sekali lagi untuk keluar", false);
-      
-      // Paksa dorong kembali state agar tombol segitiga terkunci di tempat
-      window.history.pushState({ pwa_guard: true }, '', window.location.href);
+      // Kunci kembali state ke lokasi awal
+      window.history.pushState({ pwa_root: true }, "", window.location.href);
     }
-  });
+  };
 }
 
-// Inisialisasi pengunci tombol back
-setupStrictDoubleBackHandler();
+setupBackLock();
 </script>
 </body>
 </html>

@@ -38,23 +38,23 @@ import '../styles/global.css';
             </div>
 
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
-                <a href="/" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs">
+                <button id="btn-back" type="button" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                </a>
+                </button>
                 <h2 class="text-sm font-bold text-slate-800">Tambah Transaksi Baru</h2>
                 <div class="w-9"></div>
             </div>
 
             <!-- Switch In / Out -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
-                <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
+                <button id="btn-switch-in" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
                     Pemasukan (In)
-                </a>
-                <a href="/out" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
+                </button>
+                <button id="btn-switch-out" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
                     Pengeluaran (Out)
-                </a>
+                </button>
             </div>
         </header>
 
@@ -149,6 +149,15 @@ import '../styles/global.css';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
 
+        // NAVIGASI TANPA HISTORI STACK
+        const btnBack = document.getElementById('btn-back');
+        const btnSwitchIn = document.getElementById('btn-switch-in');
+        const btnSwitchOut = document.getElementById('btn-switch-out');
+
+        if (btnBack) btnBack.addEventListener('click', () => window.location.replace('/'));
+        if (btnSwitchIn) btnSwitchIn.addEventListener('click', () => window.location.replace('/in'));
+        if (btnSwitchOut) btnSwitchOut.addEventListener('click', () => window.location.replace('/out'));
+
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
@@ -189,7 +198,7 @@ import '../styles/global.css';
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
             try {
-                // INSERT KE TABEL TRANSAKSI (Trigger Supabase meng-update tabel summary secara otomatis)
+                // INSERT KE TABEL TRANSAKSI
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
@@ -203,11 +212,10 @@ import '../styles/global.css';
 
                 if (errorInsert) throw errorInsert;
 
-                // SET STATUS UNSYNCED SUPAYA INDICATOR BERKEDIP DI DASHBOARD
                 localStorage.setItem('cashflow_sync_state', 'unsynced');
 
-                // Langsung kembali ke Dashboard
-                window.location.href = '/';
+                // Kembali ke Dashboard tanpa menambah tumpukan histori
+                window.location.replace('/');
 
             } catch (error) {
                 console.error('Gagal menyimpan pemasukan:', error);
