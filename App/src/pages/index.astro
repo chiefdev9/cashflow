@@ -22,24 +22,15 @@ import '../styles/global.css';
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-html, body {
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
-}
+body { font-family: 'Inter', sans-serif; }
 
-/* KUNCI UTAMA: Menggunakan fixed bottom yang terkunci pada viewport asli HP */
-.pwa-fixed-bottom {
-  position: fixed;
-  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 28rem; /* Equivalent to sm:max-w-md */
+/* Animasi kedip tenang/smooth untuk indikator unsynced */
+@keyframes slowPulse {
+0%, 100% { opacity: 1; transform: scale(1); }
+50% { opacity: 0.35; transform: scale(0.92); }
+}
+.animate-slow-pulse {
+animation: slowPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 </style>
 
@@ -47,10 +38,9 @@ html, body {
 <meta name="title" content="Cashflow Tanaejka" />
 <meta name="description" content="Cashflow summary - evaluate here for a brighter future" />
 </head>
+<body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-screen p-0 sm:p-4 overflow-hidden">
 
-<body class="bg-slate-100 text-slate-800 flex justify-center items-center h-full min-h-screen p-0 sm:p-4 overflow-hidden">
-
-<div class="w-full sm:max-w-md h-full sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
+<div class="w-full sm:max-w-md h-screen sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
 <!-- HEADER / SALDO -->
 <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
@@ -127,10 +117,11 @@ class="w-full h-full object-cover"
 </header>
 
 <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
-<main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-32">
+<main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-28">
 <div class="flex justify-between items-center mb-1">
 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
 
+<!-- DIOPTIMALKAN INSTAN + SMART DETECT MOBILE/PC -->
 <a
 id="btn-lihat-semua"
 href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit#gid=962128336"
@@ -150,13 +141,13 @@ Lihat Semua
 </div>
 </main>
 
-<!-- FLOATING ACTION BUTTON (DILOCK DENGAN POSITION FIXED & SAFE AREA) -->
-<div class="pwa-fixed-bottom px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
-<a id="btn-go-out" href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3.5 rounded-2xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
+<!-- FLOATING ACTION BUTTON (DISESUAIKAN PRESISI DENGAN LAMAN IN/OUT: bottom-6) -->
+<div class="absolute bottom-6 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
+<a id="btn-go-out" href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
 <span class="text-base font-bold">-</span>
 <span class="text-xs font-semibold">Keluar (Out)</span>
 </a>
-<a id="btn-go-in" href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3.5 rounded-2xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
+<a id="btn-go-in" href="/in" class="pointer-events-auto flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
 <span class="text-base font-bold">+</span>
 <span class="text-xs font-semibold">Masuk (In)</span>
 </a>
@@ -174,11 +165,13 @@ const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// FUNGSI NAVIGASI PEMBERSIH RIWAYAT (Memastikan riwayat form dihapus dari PWA)
 function redirectCleanly(targetUrl: string) {
 history.replaceState(null, '', targetUrl);
 window.location.replace(targetUrl);
 }
 
+// Handler Navigasi Tombol Bawah
 const btnGoOut = document.getElementById('btn-go-out');
 if (btnGoOut) {
 btnGoOut.addEventListener('click', (e) => {
@@ -195,6 +188,7 @@ redirectCleanly('/in');
 });
 }
 
+// PENGAMAN TOMBOL BACK ANDROID (SMART HANDLING PWA & BROWSER)
 history.pushState(null, '', location.href);
 
 window.addEventListener('popstate', () => {
@@ -218,6 +212,7 @@ const DISPLAY_BULAN_TAHUN = `${fullMonths[monthIndex]} ${year}`;
 const elHeaderBulan = document.getElementById('header-bulan');
 if (elHeaderBulan) elHeaderBulan.innerText = DISPLAY_BULAN_TAHUN;
 
+// FUNGSI UPDATE NOTIFIKASI SYNC REALTIME VIA SUPABASE
 async function updateSyncStatusUI() {
 const syncDot = document.getElementById('sync-status-dot');
 const syncText = document.getElementById('sync-status-text');
@@ -246,6 +241,7 @@ syncText.innerText = 'Synchronization Successful!';
 }
 }
 
+// FUNGSI FORMAT RUPIAH AKURAT (Intl.NumberFormat)
 function formatRupiah(angka: number | null | undefined): string {
 if (angka === null || angka === undefined || isNaN(angka)) return 'Rp 0';
 const absoluteValue = Math.abs(Number(angka));
