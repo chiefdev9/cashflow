@@ -149,6 +149,13 @@ import '../styles/global.css';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
 
+        // PENGAMAN TOMBOL BACK ANDROID:
+        // Jika tombol Back ditekan saat di form, paksa langsung balik ke dashboard
+        history.pushState(null, '', location.href);
+        window.addEventListener('popstate', () => {
+            window.location.replace('/');
+        });
+
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
@@ -189,7 +196,7 @@ import '../styles/global.css';
             const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
             try {
-                // INSERT KE TABEL TRANSAKSI (Trigger Supabase meng-update tabel summary secara otomatis)
+                // INSERT KE TABEL TRANSAKSI
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
@@ -203,11 +210,11 @@ import '../styles/global.css';
 
                 if (errorInsert) throw errorInsert;
 
-                // SET STATUS UNCYNCED BIAR NOTIFIKASI KUNING BERKEDIP DI DASHBOARD
+                // SET STATUS UNSYNCED SUPAYA INDICATOR BERKEDIP DI DASHBOARD
                 localStorage.setItem('cashflow_sync_state', 'unsynced');
 
-                // Langsung arahkan kembali ke Dashboard
-                window.location.href = '/';
+                // Menggunakan replace() agar laman form dihapus dari history browser
+                window.location.replace('/');
 
             } catch (error) {
                 console.error('Gagal menyimpan pengeluaran:', error);

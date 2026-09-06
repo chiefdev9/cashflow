@@ -165,6 +165,20 @@ const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// PENGAMAN TOMBOL BACK ANDROID (SMART HANDLING PWA & BROWSER)
+history.pushState(null, '', location.href);
+
+window.addEventListener('popstate', () => {
+    // Jika dibuka sebagai aplikasi PWA / Home Screen Standalone
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        // Di PWA, menekan Back pada entry awal akan meminimalisir/menutup aplikasi
+        window.close();
+    } else {
+        // Jika dibuka di browser biasa (Chrome), kembalikan ke state awal agar tidak pindah halaman
+        history.pushState(null, '', location.href);
+    }
+});
+
 const now = new Date();
 const monthIndex = now.getMonth();
 const year = now.getFullYear();

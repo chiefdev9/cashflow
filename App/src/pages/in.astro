@@ -149,6 +149,13 @@ import '../styles/global.css';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
 
+        // PENGAMAN TOMBOL BACK ANDROID:
+        // Jika tombol Back (segitiga) ditekan saat berada di laman ini, paksa langsung ke index
+        history.pushState(null, '', location.href);
+        window.addEventListener('popstate', () => {
+            window.location.replace('/');
+        });
+
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
@@ -206,8 +213,8 @@ import '../styles/global.css';
                 // SET STATUS UNSYNCED SUPAYA INDICATOR BERKEDIP DI DASHBOARD
                 localStorage.setItem('cashflow_sync_state', 'unsynced');
 
-                // Langsung kembali ke Dashboard
-                window.location.href = '/';
+                // Menggunakan replace() agar laman ini dihapus dari history browser dan tidak bisa di-back
+                window.location.replace('/');
 
             } catch (error) {
                 console.error('Gagal menyimpan pemasukan:', error);
