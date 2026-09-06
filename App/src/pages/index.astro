@@ -446,37 +446,35 @@ window.open(webUrl, '_blank', 'noopener,noreferrer');
 });
 }
 
-// =======================================================
-// FIX TUNTAS: KUNCI HISTORY & FORCE MINIMIZE PWA ANDROID
-// =======================================================
+// =========================================================================
+// SOLUSI DEFINITIF: TRAP & OVERRIDE SEGITIGA BACK BUTTON PWA ANDROID
+// =========================================================================
 let lastBackPressTime = 0;
 
-function initPwaBackPrevention() {
-  // 1. Bersihkan seluruh tumpukan riwayat halaman sebelumnya agar tidak bisa diswipe back
-  window.history.replaceState({ page: 'root' }, '', window.location.href);
-  window.history.pushState({ page: 'root' }, '', window.location.href);
+function setupStrictDoubleBackHandler() {
+  // 1. Injeksi state dummy ke paling atas dan bawah agar browser terkunci
+  window.history.pushState({ pwa_guard: true }, '', window.location.href);
 
-  // 2. Tahan tombol Back agar tidak memicu navigasi
   window.addEventListener('popstate', (e) => {
     const currentTime = Date.now();
     const timeDiff = currentTime - lastBackPressTime;
 
     if (timeDiff < 2000) {
-      // Jika double back dalam 2 detik, kembalikan ke entry paling dasar
-      // PWA Standalone Android akan mengartikannya sebagai keluar/minimize app
-      window.history.go(-1);
+      // Jika ditekan 2 kali dalam 2 detik, lepas kunci history
+      // Ini akan memicu OS Android untuk langsung meminimalkan/keluar dari PWA
+      window.history.go(-2);
     } else {
       lastBackPressTime = currentTime;
       showDynamicToast("Tekan sekali lagi untuk keluar", false);
       
-      // Kunci ulang state agar tidak bisa mundur
-      window.history.pushState({ page: 'root' }, '', window.location.href);
+      // Paksa dorong kembali state agar tombol segitiga terkunci di tempat
+      window.history.pushState({ pwa_guard: true }, '', window.location.href);
     }
   });
 }
 
-// Jalankan sistem pengunci history
-initPwaBackPrevention();
+// Inisialisasi pengunci tombol back
+setupStrictDoubleBackHandler();
 </script>
 </body>
 </html>
