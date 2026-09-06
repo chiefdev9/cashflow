@@ -23,10 +23,11 @@ import '../styles/global.css';
 
 <style>
 html, body {
-  height: 100%;
   font-family: 'Inter', sans-serif;
-  /* Memastikan safe-area-inset dihitung stabil sejak aplikasi pertama kali dibuka */
-  padding-bottom: env(safe-area-inset-bottom);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Animasi kedip tenang/smooth untuk indikator unsynced */
@@ -43,9 +44,9 @@ html, body {
 <meta name="title" content="Cashflow Tanaejka" />
 <meta name="description" content="Cashflow summary - evaluate here for a brighter future" />
 </head>
-<body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
+<body class="bg-slate-100 text-slate-800 flex justify-center items-center h-dvh min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-<div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200 pb-[env(safe-area-inset-bottom)]">
+<div class="w-full sm:max-w-md h-full sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
 <!-- HEADER / SALDO -->
 <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
@@ -122,7 +123,7 @@ class="w-full h-full object-cover"
 </header>
 
 <!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
-<main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
+<main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-28">
 <div class="flex justify-between items-center mb-1">
 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
 
@@ -146,8 +147,8 @@ Lihat Semua
 </div>
 </main>
 
-<!-- FLOATING ACTION BUTTON (DISEJARAHKAN & DILENGKAPI CALC SAFE AREA) -->
-<div class="absolute bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
+<!-- FLOATING ACTION BUTTON (DILOCK DENGAN BOTTOM UNIFORM) -->
+<div class="absolute bottom-6 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
 <a id="btn-go-out" href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
 <span class="text-base font-bold">-</span>
 <span class="text-xs">Keluar (Out)</span>
@@ -170,7 +171,7 @@ const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhJclQTEG6sLpF
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// FUNGSI NAVIGASI PEMBERSIH RIWAYAT (Memastikan riwayat form dihapus dari PWA)
+// FUNGSI NAVIGASI PEMBERSIH RIWAYAT
 function redirectCleanly(targetUrl: string) {
     history.replaceState(null, '', targetUrl);
     window.location.replace(targetUrl);
@@ -197,12 +198,9 @@ if (btnGoIn) {
 history.pushState(null, '', location.href);
 
 window.addEventListener('popstate', () => {
-    // Jika dibuka sebagai aplikasi PWA / Home Screen Standalone
     if (window.matchMedia('(display-mode: standalone)').matches) {
-        // Di PWA, menekan Back pada entry awal akan meminimalisir/menutup aplikasi
         window.close();
     } else {
-        // Jika dibuka di browser biasa (Chrome), kembalikan ke state awal agar tidak pindah halaman
         history.pushState(null, '', location.href);
     }
 });
@@ -226,7 +224,6 @@ async function updateSyncStatusUI() {
     const syncText = document.getElementById('sync-status-text');
     if (!syncDot || !syncText) return;
 
-    // Cek langsung ke database Supabase apakah ada transaksi yang is_synced = false
     const { count, error } = await supabase
         .from('transaksi')
         .select('*', { count: 'exact', head: true })
@@ -240,7 +237,6 @@ async function updateSyncStatusUI() {
     const isUnsynced = count && count > 0;
 
     if (isUnsynced) {
-        // MENGGUNAKAN ANIMASI SLOW-PULSE (KEDIPAN LEMBUT 2 DETIK)
         syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 flex-shrink-0 animate-slow-pulse';
         syncText.className = 'text-[11px] font-medium text-amber-600';
         syncText.innerText = "Don't forget to synchronize!";
@@ -251,7 +247,7 @@ async function updateSyncStatusUI() {
     }
 }
 
-// FUNGSI FORMAT RUPIAH AKURAT (Intl.NumberFormat)
+// FUNGSI FORMAT RUPIAH AKURAT
 function formatRupiah(angka: number | null | undefined): string {
     if (angka === null || angka === undefined || isNaN(angka)) return 'Rp 0';
     const absoluteValue = Math.abs(Number(angka));
