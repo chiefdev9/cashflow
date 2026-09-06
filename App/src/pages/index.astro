@@ -22,7 +22,12 @@ import '../styles/global.css';
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-body { font-family: 'Inter', sans-serif; }
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  /* Memastikan safe-area-inset dihitung stabil sejak aplikasi pertama kali dibuka */
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 /* Animasi kedip tenang/smooth untuk indikator unsynced */
 @keyframes slowPulse {
@@ -40,7 +45,7 @@ body { font-family: 'Inter', sans-serif; }
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-<div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
+<div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200 pb-[env(safe-area-inset-bottom)]">
 
 <!-- HEADER / SALDO -->
 <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
@@ -141,8 +146,8 @@ Lihat Semua
 </div>
 </main>
 
-<!-- FLOATING ACTION BUTTON -->
-<div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
+<!-- FLOATING ACTION BUTTON (DISEJARAHKAN & DILENGKAPI CALC SAFE AREA) -->
+<div class="absolute bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
 <a id="btn-go-out" href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
 <span class="text-base font-bold">-</span>
 <span class="text-xs">Keluar (Out)</span>
@@ -391,7 +396,7 @@ supabase
     .on('postgres_changes', { event: '*', schema: 'public', table: 'transaksi' }, () => {
         fetchTransactions();
         fetchSummary();
-        updateSyncStatusUI(); // Otomatis cek & update status sync realtime saat ada transaksi baru/diubah
+        updateSyncStatusUI();
     })
     .subscribe();
 
@@ -437,7 +442,6 @@ if (btnSyncGas) {
         try {
             const response = await fetch(GAS_WEB_APP_URL, { method: 'POST' });
             if (response.ok) {
-                // Update semua transaksi yang belum disinkron menjadi true di database Supabase
                 await supabase
                     .from('transaksi')
                     .update({ is_synced: true })
