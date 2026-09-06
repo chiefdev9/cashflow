@@ -1,7 +1,5 @@
 ---
 /*
-DOUBLE KLIK BACKSTAGEEE
-
 FILE: index.astro
 DESKRIPSI: Dashboard Cashflow Tanaejka (Notifikasi Sync Realtime & Multi-Device via Supabase)
 */
@@ -16,7 +14,6 @@ import '../styles/global.css';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
-<!-- Optimasi Koneksi Cepat ke Google Docs -->
 <link rel="dns-prefetch" href="https://docs.google.com">
 <link rel="preconnect" href="https://docs.google.com" crossorigin>
 
@@ -44,7 +41,6 @@ animation: slowPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
 <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
-<!-- HEADER / SALDO -->
 <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
 <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
 <Image
@@ -118,12 +114,10 @@ class="w-full h-full object-cover"
 </div>
 </header>
 
-<!-- KONTEN UTAMA: TRANSAKSI TERBARU -->
 <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
 <div class="flex justify-between items-center mb-1">
 <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Transaksi Terbaru</h2>
 
-<!-- DIOPTIMALKAN INSTAN + SMART DETECT MOBILE/PC -->
 <a
 id="btn-lihat-semua"
 href="https://docs.google.com/spreadsheets/d/1WH-6Ut5S10x3mNm1lSQW_H84EfjXiPV3A1pXeaGRGsg/edit#gid=962128336"
@@ -132,7 +126,6 @@ Lihat Semua
 </a>
 </div>
 
-<!-- NOTIFIKASI SYNC SPREADSHEET -->
 <div id="sync-status-container" class="flex items-center space-x-1.5 mb-2 transition-all duration-300">
 <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
 <span id="sync-status-text" class="text-[11px] font-medium text-emerald-600">Synchronization Successful!</span>
@@ -143,7 +136,6 @@ Lihat Semua
 </div>
 </main>
 
-<!-- FLOATING ACTION BUTTON -->
 <div class="absolute bottom-28 left-0 right-0 px-6 flex justify-center items-center space-x-3 pointer-events-none z-30">
 <a href="/out" class="pointer-events-auto flex-1 bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-xl shadow-lg flex items-center justify-center space-x-2 transition transform active:scale-95 no-underline cursor-pointer">
 <span class="text-base font-bold">-</span>
@@ -157,7 +149,6 @@ Lihat Semua
 
 </div>
 
-<!-- SCRIPT REALTIME SUPABASE -->
 <script>
 import { createClient } from '@supabase/supabase-js';
 
@@ -456,29 +447,32 @@ window.open(webUrl, '_blank', 'noopener,noreferrer');
 }
 
 // =======================================================
-// DUKUNGAN MEMINIMALKAN PWA ANDROID DENGAN DOUBLE BACK
+// FIX: DOUBLE BACK KELUAR / MINIMIZE UNTUK PWA ANDROID
 // =======================================================
-let lastBackPressTime = 0;
+let lastBackPress = 0;
 
-function setupBackMinimizer() {
-  window.history.pushState({ page: 'pwa_root' }, '', window.location.href);
+function handlePwaDoubleBack() {
+  // Sisipkan state ganda untuk mengunci history bawaan browser
+  window.history.pushState(null, '', window.location.href);
 
   window.addEventListener('popstate', () => {
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastBackPressTime;
+    const now = Date.now();
+    const isDoubleTap = now - lastBackPress < 2000;
 
-    if (timeDiff < 2000) {
-      // Jika ditekan 2x dalam 2 detik, kembalikan history awal agar Android meminimize PWA
-      window.history.back();
+    if (isDoubleTap) {
+      // Jika ditekan 2x berturut-turut, paksa mundur 2 langkah (keluar dari PWA ke launcher/background)
+      window.history.go(-2);
     } else {
-      lastBackPressTime = currentTime;
-      showDynamicToast("Tekan sekali lagi untuk meminimalkan", false);
-      window.history.pushState({ page: 'pwa_root' }, '', window.location.href);
+      lastBackPress = now;
+      showDynamicToast("Tekan sekali lagi untuk keluar", false);
+      // Kunci kembali state history agar tidak berpindah ke halaman sebelumnya jika ditekan sekali lagi
+      window.history.pushState(null, '', window.location.href);
     }
   });
 }
 
-setupBackMinimizer();
+// Inisialisasi handler
+handlePwaDoubleBack();
 </script>
 </body>
 </html>
