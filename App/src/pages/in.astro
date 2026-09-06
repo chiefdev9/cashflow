@@ -38,23 +38,23 @@ import '../styles/global.css';
             </div>
 
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
-                <a href="/" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs">
+                <button id="btnBackHeader" type="button" class="w-9 h-9 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 transition shadow-xs cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
-                </a>
+                </button>
                 <h2 class="text-sm font-bold text-slate-800">Tambah Transaksi Baru</h2>
                 <div class="w-9"></div>
             </div>
 
             <!-- Switch In / Out -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
-                <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
+                <button id="btnSwitchIn" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
                     Pemasukan (In)
-                </a>
-                <a href="/out" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
+                </button>
+                <button id="btnSwitchOut" type="button" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center text-slate-600 hover:bg-slate-100 cursor-pointer">
                     Pengeluaran (Out)
-                </a>
+                </button>
             </div>
         </header>
 
@@ -149,12 +149,29 @@ import '../styles/global.css';
         
         const supabase = createClient(supabaseUrl, supabaseKey);
 
+        // FUNGSI NAVIGASI PEMBERSIH RIWAYAT (Memastikan riwayat form dihapus dari PWA)
+        function redirectCleanly(targetUrl: string) {
+            history.replaceState(null, '', targetUrl);
+            window.location.replace(targetUrl);
+        }
+
         // PENGAMAN TOMBOL BACK ANDROID:
-        // Jika tombol Back (segitiga) ditekan saat berada di laman ini, paksa langsung ke index
-        history.pushState(null, '', location.href);
+        // Menangkap tombol back fisik dan mengarahkan kembali ke Dashboard secara bersih
         window.addEventListener('popstate', () => {
-            window.location.replace('/');
+            redirectCleanly('/');
         });
+
+        // Tombol Back Panah di Header
+        const btnBackHeader = document.getElementById('btnBackHeader');
+        if (btnBackHeader) {
+            btnBackHeader.addEventListener('click', () => redirectCleanly('/'));
+        }
+
+        // Switch Tab ke Out
+        const btnSwitchOut = document.getElementById('btnSwitchOut');
+        if (btnSwitchOut) {
+            btnSwitchOut.addEventListener('click', () => redirectCleanly('/out'));
+        }
 
         const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
         const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
@@ -213,8 +230,8 @@ import '../styles/global.css';
                 // SET STATUS UNSYNCED SUPAYA INDICATOR BERKEDIP DI DASHBOARD
                 localStorage.setItem('cashflow_sync_state', 'unsynced');
 
-                // Menggunakan replace() agar laman ini dihapus dari history browser dan tidak bisa di-back
-                window.location.replace('/');
+                // Alihkan ke Dashboard dan bersihkan riwayat form dari PWA
+                redirectCleanly('/');
 
             } catch (error) {
                 console.error('Gagal menyimpan pemasukan:', error);
