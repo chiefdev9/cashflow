@@ -1,5 +1,7 @@
 ---
 /*
+DOUBLE KLIK BACKSTAGEEE
+
 FILE: index.astro
 DESKRIPSI: Dashboard Cashflow Tanaejka (Notifikasi Sync Realtime & Multi-Device via Supabase)
 */
@@ -452,6 +454,31 @@ window.open(webUrl, '_blank', 'noopener,noreferrer');
 }
 });
 }
+
+// =======================================================
+// DUKUNGAN MEMINIMALKAN PWA ANDROID DENGAN DOUBLE BACK
+// =======================================================
+let lastBackPressTime = 0;
+
+function setupBackMinimizer() {
+  window.history.pushState({ page: 'pwa_root' }, '', window.location.href);
+
+  window.addEventListener('popstate', () => {
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastBackPressTime;
+
+    if (timeDiff < 2000) {
+      // Jika ditekan 2x dalam 2 detik, kembalikan history awal agar Android meminimize PWA
+      window.history.back();
+    } else {
+      lastBackPressTime = currentTime;
+      showDynamicToast("Tekan sekali lagi untuk meminimalkan", false);
+      window.history.pushState({ page: 'pwa_root' }, '', window.location.href);
+    }
+  });
+}
+
+setupBackMinimizer();
 </script>
 </body>
 </html>
