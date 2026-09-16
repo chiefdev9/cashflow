@@ -1,7 +1,7 @@
 --- 
 /* 
     FILE: out.astro
-    DESKRIPSI: Form Tambah Pengeluaran (Simpan ke Supabase & Update Tabel Summary via Trigger).
+    DESKRIPSI: Form Tambah Pengeluaran dengan Custom Modern Dropdown UI & Supabase Integration.
 */
 
 import { Image } from 'astro:assets';
@@ -61,7 +61,7 @@ import '../styles/global.css';
         </header>
 
         <!-- Main Form Content -->
-        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48">
+        <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48 relative">
             <form id="formOut" class="space-y-3 sm:space-y-4">
                 
                 <!-- Input Nominal Pengeluaran -->
@@ -83,36 +83,88 @@ import '../styles/global.css';
                     </div>
                 </div>
 
-                <!-- Select Sumber -->
-                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                <!-- Custom Dropdown: Sumber Dana / Pos -->
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1 relative z-30">
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                         Sumber Dana / Pos
                     </label>
-                    <select id="sumber" class="w-full text-sm font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
-                        <!-- BANNER BELAJAR: Tambahkan daftar pilihan sumber/kantong dana di bawah ini -->
-                        <option value="Rutin">Rutin (Anggaran Bulanan)</option>
-                        <option value="Tentatif">Tentatif (Dana Darurat / Bebas)</option>
-                        <option value="Tabungan">Tabungan / Kas</option>
-                    </select>
+                    <div class="relative w-full">
+                        <button id="sumber-btn" type="button" class="w-full text-sm font-semibold text-slate-700 flex items-center justify-between focus:outline-none cursor-pointer py-1">
+                            <span id="sumber-label" class="truncate">Rutin</span>
+                            <svg id="sumber-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <div id="sumber-menu" class="hidden absolute left-0 right-0 top-full mt-2 bg-white/95 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-1.5 z-50 transition-all duration-200 opacity-0 scale-95 transform origin-top">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Pilih Sumber / Pos</div>
+                            <ul class="flex flex-col gap-0.5">
+                                <li data-value="Rutin" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors bg-slate-100 text-slate-900">
+                                    <span>Rutin (Anggaran Bulanan)</span>
+                                    <svg class="check-icon w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                </li>
+                                <li data-value="Tentatif" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                    <span>Tentatif (Dana Darurat / Bebas)</span>
+                                    <svg class="check-icon w-4 h-4 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                </li>
+                                <li data-value="Tabungan" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                    <span>Tabungan / Kas</span>
+                                    <svg class="check-icon w-4 h-4 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Grid Kategori & Tanggal -->
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- Select Kategori -->
-                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                <div class="grid grid-cols-2 gap-3 relative z-20">
+                    <!-- Custom Dropdown: Kategori -->
+                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1 relative">
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                             Kategori
                         </label>
-                        <select id="kategori" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer">
-                            <!-- BANNER BELAJAR: Tambahkan daftar pilihan kategori pengeluaran di bawah ini -->
-                            <option value="Kebutuhan Pokok">Kebutuhan Pokok</option>
-                            <option value="Makanan & Minuman">Makanan & Minuman</option>
-                            <option value="Transportasi">Transportasi</option>
-                            <option value="Tagihan & Utilitas">Tagihan & Utilitas</option>
-                            <option value="Hiburan">Hiburan & Gaya Hidup</option>
-                            <option value="Kesehatan">Kesehatan</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
+                        <div class="relative w-full">
+                            <button id="kategori-btn" type="button" class="w-full text-xs font-semibold text-slate-700 flex items-center justify-between focus:outline-none cursor-pointer py-1">
+                                <span id="kategori-label" class="truncate">Kebutuhan Pokok</span>
+                                <svg id="kategori-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <div id="kategori-menu" class="hidden absolute left-0 right-0 top-full mt-2 bg-white/95 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-1.5 z-50 transition-all duration-200 opacity-0 scale-95 transform origin-top max-h-56 overflow-y-auto">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Pilih Kategori</div>
+                                <ul class="flex flex-col gap-0.5">
+                                    <li data-value="Kebutuhan Pokok" class="kategori-option px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors bg-slate-100 text-slate-900">
+                                        <span>Kebutuhan Pokok</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Makanan & Minuman" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Makanan & Minuman</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Transportasi" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Transportasi</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Tagihan & Utilitas" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Tagihan & Utilitas</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Hiburan" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Hiburan & Gaya Hidup</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Kesehatan" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Kesehatan</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Lainnya" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Lainnya</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-rose-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Input Tanggal -->
@@ -129,7 +181,7 @@ import '../styles/global.css';
                 </div>
 
                 <!-- Input Catatan -->
-                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
+                <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1 relative z-10">
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                         Catatan (Opsional)
                     </label>
@@ -166,10 +218,8 @@ import '../styles/global.css';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         // 2. Mengambil Element DOM
-        const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
-        const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
-        const btn = document.getElementById('btnSimpan') as HTMLButtonElement | null;
-        const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
+        const nominalEl = document.getElementById('nominal');
+        const waktuEl = document.getElementById('waktu');
 
         // 3. Mengatur Default Tanggal ke Hari Ini (Format: YYYY-MM-DD)
         if (waktuEl) {
@@ -180,62 +230,145 @@ import '../styles/global.css';
             waktuEl.value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // 4. Format Otomatis Angka Ribuan Saat Mengetik (misal: 50000 -> 50,000)
+        // 4. Format Otomatis Angka Ribuan Saat Mengetik
         nominalEl?.addEventListener('input', (e) => {
-            const input = e.target as HTMLInputElement;
-            let value = input.value.replace(/\D/g, ''); // Hapus semua karakter selain angka
-            if (value) value = Number(value).toLocaleString('en-US'); // Tambahkan separator koma
+            const input = e.target;
+            let value = input.value.replace(/\D/g, '');
+            if (value) value = Number(value).toLocaleString('en-US');
             input.value = value;
         });
 
-        // 5. Handler Klik Tombol Simpan Data Pengeluaran
+        // ==========================================
+        // SYSTEM LOGIC CUSTOM DROPDOWN (MODERN UI)
+        // ==========================================
+        let selectedSumber = "Rutin";
+        let selectedKategori = "Kebutuhan Pokok";
+
+        function setupCustomDropdown(btnId, menuId, arrowId, labelId, optionClass, onSelect) {
+            const btn = document.getElementById(btnId);
+            const menu = document.getElementById(menuId);
+            const arrow = document.getElementById(arrowId);
+            const label = document.getElementById(labelId);
+            const options = document.querySelectorAll(`.${optionClass}`);
+
+            function toggle() {
+                const isHidden = menu.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                    setTimeout(() => {
+                        menu.classList.remove('opacity-0', 'scale-95');
+                        menu.classList.add('opacity-100', 'scale-100');
+                        arrow?.classList.add('rotate-180');
+                    }, 10);
+                }
+            }
+
+            function close() {
+                menu?.classList.remove('opacity-100', 'scale-100');
+                menu?.classList.add('opacity-0', 'scale-95');
+                arrow?.classList.remove('rotate-180');
+                setTimeout(() => {
+                    menu?.classList.add('hidden');
+                }, 150);
+            }
+
+            btn?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggle();
+            });
+
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = opt.getAttribute('data-value');
+                    if (val && label) {
+                        label.innerText = val;
+                        
+                        // Highlight Option & Show Check Icon
+                        options.forEach(o => {
+                            const check = o.querySelector('.check-icon');
+                            if (o.getAttribute('data-value') === val) {
+                                o.classList.add('bg-slate-100', 'text-slate-900', 'font-semibold');
+                                o.classList.remove('font-medium');
+                                check?.classList.remove('hidden');
+                            } else {
+                                o.classList.remove('bg-slate-100', 'text-slate-900', 'font-semibold');
+                                o.classList.add('font-medium');
+                                check?.classList.add('hidden');
+                            }
+                        });
+
+                        onSelect(val);
+                        close();
+                    }
+                });
+            });
+
+            return { close };
+        }
+
+        const sumberDropdown = setupCustomDropdown('sumber-btn', 'sumber-menu', 'sumber-arrow', 'sumber-label', 'sumber-option', (val) => {
+            selectedSumber = val;
+        });
+
+        const kategoriDropdown = setupCustomDropdown('kategori-btn', 'kategori-menu', 'kategori-arrow', 'kategori-label', 'kategori-option', (val) => {
+            selectedKategori = val;
+        });
+
+        function closeAllDropdowns() {
+            sumberDropdown.close();
+            kategoriDropdown.close();
+        }
+
+        document.addEventListener('click', (e) => {
+            closeAllDropdowns();
+        });
+
+        // ==========================================
+        // PROSES SIMPAN KE SUPABASE
+        // ==========================================
+        const btn = document.getElementById('btnSimpan');
+        const btnText = document.getElementById('btnText');
+
         btn?.addEventListener('click', async () => {
             if (!btn) return;
 
-            // Ambil nominal asli (menghilangkan tanda koma)
             const rawNominal = nominalEl ? Number(nominalEl.value.replace(/,/g, '')) : 0;
-            
-            // Validasi input nominal
             if (!rawNominal || rawNominal <= 0) {
                 alert('Silakan masukkan nominal transaksi yang valid.');
                 return;
             }
 
-            // Ubah status tombol menjadi Loading
             if (btnText) btnText.innerText = 'Menyimpan...';
             btn.disabled = true;
 
-            const sumberEl = document.getElementById('sumber') as HTMLSelectElement | null;
-            const kategoriEl = document.getElementById('kategori') as HTMLSelectElement | null;
-            const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
+            const catatanEl = document.getElementById('catatan');
 
             try {
                 // INSERT KE TABEL TRANSAKSI (jenis: 'Out')
-                // Catatan: Trigger di Database Supabase akan otomatis memperbarui tabel summary
                 const { error: errorInsert } = await supabase
                     .from('transaksi')
                     .insert([{
                         jenis: 'Out',
                         angka: rawNominal,
-                        sumber: sumberEl ? sumberEl.value : 'Rutin',
-                        kategori: kategoriEl ? kategoriEl.value : 'Kebutuhan Pokok',
-                        waktu: waktuEl ? waktuEl.value : new Date().toISOString(),
+                        sumber: selectedSumber,
+                        kategori: selectedKategori,
+                        waktu: waktuEl && waktuEl.value ? waktuEl.value : new Date().toISOString(),
                         catatan: catatanEl ? catatanEl.value : ''
                     }]);
 
                 if (errorInsert) throw errorInsert;
 
-                // Tandai status sync di LocalStorage agar indikator di dashboard mengetahui ada pembaruan
+                // SET STATUS UNSYNCED SUPAYA INDICATOR BERKEDIP DI DASHBOARD
                 localStorage.setItem('cashflow_sync_state', 'unsynced');
 
-                // Redirect kembali ke halaman utama (Dashboard)
+                // Langsung kembali ke Dashboard
                 window.location.href = '/';
 
             } catch (error) {
                 console.error('Gagal menyimpan pengeluaran:', error);
                 alert('Terjadi kesalahan saat menyimpan data.');
-                
-                // Kembalikan status tombol jika gagal
                 if (btnText) btnText.innerText = 'Simpan Pengeluaran';
                 btn.disabled = false;
             }
