@@ -1,9 +1,5 @@
 --- 
-/* 
-    FILE: in.astro
-    DESKRIPSI: Form Tambah Pemasukan dengan Custom Modern Dropdown UI & Supabase Integration.
-*/
-
+/* FILE: in.astro - Form Tambah Pemasukan */
 import { Image } from 'astro:assets';
 import '../styles/global.css';
 ---
@@ -22,19 +18,12 @@ import '../styles/global.css';
 </head>
 <body class="bg-slate-100 text-slate-800 flex justify-center items-center min-h-dvh p-0 sm:p-4 overflow-hidden">
 
-    <!-- Container Utama: Frame HP -->
     <div class="w-full sm:max-w-md h-dvh sm:h-[844px] bg-slate-50 shadow-2xl sm:rounded-3xl flex flex-col overflow-hidden relative border border-slate-200">
 
         <!-- Header -->
         <header class="bg-white p-4 sm:p-5 pb-5 sm:pb-6 rounded-b-[2.5rem] shadow-sm border-b border-slate-100 relative overflow-hidden flex-shrink-0 z-10">
             <div class="absolute inset-0 opacity-30 pointer-events-none overflow-hidden flex items-center justify-center">
-                <Image 
-                    src="/bg.jpg" 
-                    alt="Aksen Vektor Header" 
-                    width={800}
-                    height={600}
-                    class="w-full h-full object-cover scale-125 transform"
-                />
+                <Image src="/bg.jpg" alt="Header Accent" width={800} height={600} class="w-full h-full object-cover scale-125 transform" />
             </div>
 
             <div class="flex justify-between items-center mb-3 sm:mb-5 relative z-10">
@@ -47,7 +36,6 @@ import '../styles/global.css';
                 <div class="w-9"></div>
             </div>
 
-            <!-- Switch In / Out -->
             <div class="bg-white/90 backdrop-blur-md border border-slate-200/80 p-1.5 rounded-2xl shadow-xs relative z-10 flex space-x-1">
                 <a href="/in" class="flex-1 py-2 text-xs font-semibold rounded-xl transition text-center bg-emerald-600 text-white shadow-xs cursor-pointer">
                     Pemasukan (In)
@@ -58,51 +46,47 @@ import '../styles/global.css';
             </div>
         </header>
 
-        <!-- Main Form Content -->
+        <!-- Main Form -->
         <main class="flex-1 overflow-y-auto p-4 space-y-3 sm:space-y-4 pb-48 relative">
             <form id="formIn" class="space-y-3 sm:space-y-4">
                 
-                <!-- Nominal Pemasukan -->
+                <!-- Nominal -->
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1">
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                         Nominal Pemasukan
                     </label>
                     <div class="relative flex items-center">
                         <span class="text-lg font-bold text-slate-400 mr-2">Rp</span>
-                        <input 
-                            id="nominal"
-                            type="text" 
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="0" 
-                            class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300"
-                            required
-                        />
+                        <input id="nominal" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="0" class="w-full text-xl font-bold text-slate-800 focus:outline-none bg-transparent placeholder-slate-300" required />
                     </div>
                 </div>
 
-                <!-- Custom Dropdown: Sumber -->
+                <!-- Custom Dropdown: Sumber Dana -->
                 <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1 relative z-30">
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        Sumber
+                        Sumber Dana / Rekening
                     </label>
                     <div class="relative w-full">
                         <button id="sumber-btn" type="button" class="w-full text-sm font-semibold text-slate-700 flex items-center justify-between focus:outline-none cursor-pointer py-1">
-                            <span id="sumber-label">Rutin</span>
-                            <svg id="sumber-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <span id="sumber-label" class="truncate">Utama</span>
+                            <svg id="sumber-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
 
                         <div id="sumber-menu" class="hidden absolute left-0 right-0 top-full mt-2 bg-white/95 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-1.5 z-50 transition-all duration-200 opacity-0 scale-95 transform origin-top">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Pilih Sumber</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Pilih Rekening Target</div>
                             <ul class="flex flex-col gap-0.5">
-                                <li data-value="Rutin" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors bg-slate-100 text-slate-900">
-                                    <span>Rutin</span>
+                                <li data-value="Utama" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors bg-slate-100 text-slate-900">
+                                    <span>Rekening Utama</span>
                                     <svg class="check-icon w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                                 </li>
-                                <li data-value="Tentatif" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
-                                    <span>Tentatif</span>
+                                <li data-value="Dompet Digital" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                    <span>Dompet Digital (E-Wallet)</span>
+                                    <svg class="check-icon w-4 h-4 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                </li>
+                                <li data-value="Tunai" class="sumber-option px-3 py-2.5 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                    <span>Tunai (Cash)</span>
                                     <svg class="check-icon w-4 h-4 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                                 </li>
                             </ul>
@@ -110,6 +94,7 @@ import '../styles/global.css';
                     </div>
                 </div>
 
+                <!-- Grid Kategori & Tanggal -->
                 <div class="grid grid-cols-2 gap-3 relative z-20">
                     <!-- Custom Dropdown: Kategori -->
                     <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-slate-100 space-y-1 relative">
@@ -118,29 +103,33 @@ import '../styles/global.css';
                         </label>
                         <div class="relative w-full">
                             <button id="kategori-btn" type="button" class="w-full text-xs font-semibold text-slate-700 flex items-center justify-between focus:outline-none cursor-pointer py-1">
-                                <span id="kategori-label" class="truncate">Usaha</span>
+                                <span id="kategori-label" class="truncate">Gaji Utama</span>
                                 <svg id="kategori-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
 
-                            <div id="kategori-menu" class="hidden absolute left-0 right-0 top-full mt-2 bg-white/95 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-1.5 z-50 transition-all duration-200 opacity-0 scale-95 transform origin-top">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Pilih Kategori</div>
+                            <div id="kategori-menu" class="hidden absolute left-0 right-0 top-full mt-2 bg-white/95 backdrop-blur-md border border-slate-100 shadow-2xl rounded-2xl p-1.5 z-50 transition-all duration-200 opacity-0 scale-95 transform origin-top max-h-56 overflow-y-auto">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Pilih Sumber Income</div>
                                 <ul class="flex flex-col gap-0.5">
-                                    <li data-value="Usaha" class="kategori-option px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors bg-slate-100 text-slate-900">
-                                        <span>Usaha</span>
+                                    <li data-value="Gaji Utama" class="kategori-option px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors bg-slate-100 text-slate-900">
+                                        <span>Gaji Utama</span>
                                         <svg class="check-icon w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                                     </li>
-                                    <li data-value="Gaji" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
-                                        <span>Gaji</span>
+                                    <li data-value="Bonus / TFR" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Bonus / THR</span>
                                         <svg class="check-icon w-3.5 h-3.5 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                                     </li>
-                                    <li data-value="Bonus" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
-                                        <span>Bonus</span>
+                                    <li data-value="Freelance" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Project / Freelance</span>
+                                        <svg class="check-icon w-3.5 h-3.5 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                    </li>
+                                    <li data-value="Investasi" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
+                                        <span>Hasil Investasi</span>
                                         <svg class="check-icon w-3.5 h-3.5 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                                     </li>
                                     <li data-value="Lainnya" class="kategori-option px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100 cursor-pointer flex items-center justify-between transition-colors">
-                                        <span>Lainnya</span>
+                                        <span>Pemasukan Lainnya</span>
                                         <svg class="check-icon w-3.5 h-3.5 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                                     </li>
                                 </ul>
@@ -153,11 +142,7 @@ import '../styles/global.css';
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                             Tanggal
                         </label>
-                        <input 
-                            id="waktu"
-                            type="date" 
-                            class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer"
-                        />
+                        <input id="waktu" type="date" class="w-full text-xs font-semibold text-slate-700 focus:outline-none bg-transparent cursor-pointer" />
                     </div>
                 </div>
 
@@ -166,17 +151,12 @@ import '../styles/global.css';
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
                         Catatan (Opsional)
                     </label>
-                    <textarea 
-                        id="catatan"
-                        rows="2"
-                        placeholder="Tambahkan detail catatan jika perlu..." 
-                        class="w-full text-xs text-slate-800 focus:outline-none bg-transparent placeholder-slate-300 resize-none font-medium"
-                    ></textarea>
+                    <textarea id="catatan" rows="2" placeholder="Tambahkan catatan jika perlu..." class="w-full text-xs text-slate-800 focus:outline-none bg-transparent placeholder-slate-300 resize-none font-medium"></textarea>
                 </div>
             </form>
         </main>
 
-        <!-- Tombol Simpan Pemasukan -->
+        <!-- Tombol Simpan -->
         <div class="absolute bottom-28 left-0 right-0 px-6 pointer-events-none z-30">
             <button id="btnSimpan" type="button" class="pointer-events-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl shadow-lg text-sm transition transform active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -193,13 +173,11 @@ import '../styles/global.css';
 
         const supabaseUrl = 'https://qcmfltewnmtvpswthbcj.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjbWZsdGV3bm10dnBzd3RoYmNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzEyMjEsImV4cCI6MjEwMjUwNzIyMX0.gj5rUMELfGeyIOtmWepN-rekU1-lubX1ll-zyGHzVCU';
-        
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        const nominalEl = document.getElementById('nominal');
-        const waktuEl = document.getElementById('waktu');
+        const nominalEl = document.getElementById('nominal') as HTMLInputElement | null;
+        const waktuEl = document.getElementById('waktu') as HTMLInputElement | null;
 
-        // Set default nilai tanggal hari ini (YYYY-MM-DD)
         if (waktuEl) {
             const today = new Date();
             const yyyy = today.getFullYear();
@@ -208,62 +186,55 @@ import '../styles/global.css';
             waktuEl.value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // Format angka ribuan dengan koma
         nominalEl?.addEventListener('input', (e) => {
-            const input = e.target;
+            const input = e.target as HTMLInputElement;
             let value = input.value.replace(/\D/g, '');
             if (value) value = Number(value).toLocaleString('en-US');
             input.value = value;
         });
 
-        // ==========================================
-        // SYSTEM LOGIC CUSTOM DROPDOWN (MODERN UI)
-        // ==========================================
-        let selectedSumber = "Rutin";
-        let selectedKategori = "Usaha";
+        // Dropdown System
+        let selectedSumber = "Utama";
+        let selectedKategori = "Gaji Utama";
 
-        function setupCustomDropdown(btnId, menuId, arrowId, labelId, optionClass, onSelect) {
+        function setupCustomDropdown(btnId: string, menuId: string, arrowId: string, labelId: string, optionClass: string, onSelect: (val: string) => void) {
             const btn = document.getElementById(btnId);
             const menu = document.getElementById(menuId);
             const arrow = document.getElementById(arrowId);
             const label = document.getElementById(labelId);
             const options = document.querySelectorAll(`.${optionClass}`);
 
-            function toggle() {
-                const isHidden = menu.classList.contains('hidden');
-                closeAllDropdowns();
-                if (isHidden) {
-                    menu.classList.remove('hidden');
-                    setTimeout(() => {
-                        menu.classList.remove('opacity-0', 'scale-95');
-                        menu.classList.add('opacity-100', 'scale-100');
-                        arrow?.classList.add('rotate-180');
-                    }, 10);
-                }
+            function openMenu() {
+                if (!menu) return;
+                menu.classList.remove('hidden');
+                void menu.offsetWidth;
+                menu.classList.remove('opacity-0', 'scale-95');
+                menu.classList.add('opacity-100', 'scale-100');
+                arrow?.classList.add('rotate-180');
             }
 
-            function close() {
-                menu?.classList.remove('opacity-100', 'scale-100');
-                menu?.classList.add('opacity-0', 'scale-95');
+            function closeMenu() {
+                if (!menu || menu.classList.contains('hidden')) return;
+                menu.classList.remove('opacity-100', 'scale-100');
+                menu.classList.add('opacity-0', 'scale-95');
                 arrow?.classList.remove('rotate-180');
-                setTimeout(() => {
-                    menu?.classList.add('hidden');
-                }, 150);
+                setTimeout(() => menu.classList.add('hidden'), 150);
             }
 
-            btn?.addEventListener('click', (e) => {
+            btn?.addEventListener('click', (e: MouseEvent) => {
                 e.stopPropagation();
-                toggle();
+                if (!menu) return;
+                const isClosed = menu.classList.contains('hidden');
+                closeAllDropdowns();
+                if (isClosed) openMenu();
             });
 
             options.forEach(opt => {
-                opt.addEventListener('click', (e) => {
+                opt.addEventListener('click', (e: Event) => {
                     e.stopPropagation();
                     const val = opt.getAttribute('data-value');
                     if (val && label) {
                         label.innerText = val;
-                        
-                        // Highlight Option & Show Check Icon
                         options.forEach(o => {
                             const check = o.querySelector('.check-icon');
                             if (o.getAttribute('data-value') === val) {
@@ -276,42 +247,31 @@ import '../styles/global.css';
                                 check?.classList.add('hidden');
                             }
                         });
-
                         onSelect(val);
-                        close();
+                        closeMenu();
                     }
                 });
             });
 
-            return { close };
+            return { close: closeMenu };
         }
 
-        const sumberDropdown = setupCustomDropdown('sumber-btn', 'sumber-menu', 'sumber-arrow', 'sumber-label', 'sumber-option', (val) => {
-            selectedSumber = val;
-        });
-
-        const kategoriDropdown = setupCustomDropdown('kategori-btn', 'kategori-menu', 'kategori-arrow', 'kategori-label', 'kategori-option', (val) => {
-            selectedKategori = val;
-        });
+        const sumberDropdown = setupCustomDropdown('sumber-btn', 'sumber-menu', 'sumber-arrow', 'sumber-label', 'sumber-option', (val) => selectedSumber = val);
+        const kategoriDropdown = setupCustomDropdown('kategori-btn', 'kategori-menu', 'kategori-arrow', 'kategori-label', 'kategori-option', (val) => selectedKategori = val);
 
         function closeAllDropdowns() {
             sumberDropdown.close();
             kategoriDropdown.close();
         }
 
-        document.addEventListener('click', (e) => {
-            closeAllDropdowns();
-        });
+        document.addEventListener('click', closeAllDropdowns);
 
-        // ==========================================
-        // PROSES SIMPAN KE SUPABASE
-        // ==========================================
-        const btn = document.getElementById('btnSimpan');
-        const btnText = document.getElementById('btnText');
+        // Submit
+        const btn = document.getElementById('btnSimpan') as HTMLButtonElement | null;
+        const btnText = document.getElementById('btnText') as HTMLSpanElement | null;
 
         btn?.addEventListener('click', async () => {
             if (!btn) return;
-
             const rawNominal = nominalEl ? Number(nominalEl.value.replace(/,/g, '')) : 0;
             if (!rawNominal || rawNominal <= 0) {
                 alert('Silakan masukkan nominal transaksi yang valid.');
@@ -321,31 +281,24 @@ import '../styles/global.css';
             if (btnText) btnText.innerText = 'Menyimpan...';
             btn.disabled = true;
 
-            const catatanEl = document.getElementById('catatan');
+            const catatanEl = document.getElementById('catatan') as HTMLTextAreaElement | null;
 
             try {
-                // INSERT KE TABEL TRANSAKSI
-                const { error: errorInsert } = await supabase
-                    .from('transaksi')
-                    .insert([{
-                        jenis: 'In',
-                        angka: rawNominal,
-                        sumber: selectedSumber,
-                        kategori: selectedKategori,
-                        waktu: waktuEl && waktuEl.value ? waktuEl.value : new Date().toISOString(),
-                        catatan: catatanEl ? catatanEl.value : ''
-                    }]);
+                const { error: errorInsert } = await supabase.from('transaksi').insert([{
+                    jenis: 'In',
+                    angka: rawNominal,
+                    sumber: selectedSumber,
+                    kategori: selectedKategori,
+                    waktu: waktuEl && waktuEl.value ? waktuEl.value : new Date().toISOString(),
+                    catatan: catatanEl ? catatanEl.value : ''
+                }]);
 
                 if (errorInsert) throw errorInsert;
 
-                // SET STATUS UNSYNCED SUPAYA INDICATOR BERKEDIP DI DASHBOARD
                 localStorage.setItem('cashflow_sync_state', 'unsynced');
-
-                // Langsung kembali ke Dashboard
                 window.location.href = '/';
-
             } catch (error) {
-                console.error('Gagal menyimpan pemasukan:', error);
+                console.error('Gagal menyimpan:', error);
                 alert('Terjadi kesalahan saat menyimpan data.');
                 if (btnText) btnText.innerText = 'Simpan Pemasukan';
                 btn.disabled = false;
