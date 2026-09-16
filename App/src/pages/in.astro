@@ -68,7 +68,7 @@ import '../styles/global.css';
                     </label>
                     <div class="relative w-full">
                         <button id="sumber-btn" type="button" class="w-full text-sm font-semibold text-slate-700 flex items-center justify-between focus:outline-none cursor-pointer py-1">
-                            <span id="sumber-label" class="truncate">Utama</span>
+                            <span id="sumber-label" class="truncate">Rutin</span>
                             <svg id="sumber-arrow" class="w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                             </svg>
@@ -99,7 +99,7 @@ import '../styles/global.css';
                         </label>
                         <div class="relative w-full">
                             <button id="kategori-btn" type="button" class="w-full text-xs font-semibold text-slate-700 flex items-center justify-between focus:outline-none cursor-pointer py-1">
-                                <span id="kategori-label" class="truncate">Gaji Utama</span>
+                                <span id="kategori-label" class="truncate">Gaji</span>
                                 <svg id="kategori-arrow" class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 flex-shrink-0 ml-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                                 </svg>
@@ -186,8 +186,8 @@ import '../styles/global.css';
         });
 
         // Dropdown System
-        let selectedSumber = "Utama";
-        let selectedKategori = "Gaji Utama";
+        let selectedSumber = "Rutin";
+        let selectedKategori = "Gaji";
 
         function setupCustomDropdown(btnId: string, menuId: string, arrowId: string, labelId: string, optionClass: string, onSelect: (val: string) => void) {
             const btn = document.getElementById(btnId);
