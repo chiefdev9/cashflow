@@ -218,22 +218,42 @@ return angka < 0 ? `-Rp ${formatted}` : `Rp ${formatted}`;
 }
 
 async function fetchSummary() {
-const { data, error } = await supabase
-.from('summary')
-.select('*')
-.eq('Bulan', TARGET_BULAN)
-.maybeSingle();
+// Ambil data langsung dari tabel transaksi agar bisa dihitung otomatis secara real-time
+const { data: transactions, error } = await supabase
+.from('transaksi')
+.select('*');
 
 if (error) {
-console.error('Gagal memuat data ringkasan:', error);
+console.error('Gagal memuat data transaksi untuk kalkulasi summary:', error);
+return;
 }
 
-const summaryData = data || {
-Perputaran: 0,
-Sisa_Bulanan: 0,
-Sisa_Akhir: 0,
-Pemasukan: 0,
-Pengeluaran: 0
+let totalPemasukan = 0;
+let totalPengeluaran = 0;
+
+// Lakukan perhitungan matematis otomatis dari daftar transaksi
+if (transactions && transactions.length > 0) {
+transactions.forEach(item => {
+const nominal = Number(item.angka) || 0;
+if (item.jenis && item.jenis.toLowerCase() === 'in') {
+totalPemasukan += nominal;
+} else {
+totalPengeluaran += nominal;
+}
+});
+}
+
+// Kalkulasi otomatis rumus keuangan Anda
+const perputaran = totalPemasukan + totalPengeluaran;
+const sisaBulanan = totalPemasukan - totalPengeluaran;
+const sisaAkhir = sisaBulanan; // Sesuaikan jika ada akumulasi saldo akhir
+
+const summaryData = {
+Perputaran: perputaran,
+Sisa_Bulanan: sisaBulanan,
+Sisa_Akhir: sisaAkhir,
+Pemasukan: totalPemasukan,
+Pengeluaran: totalPengeluaran
 };
 
 const elPerputaran = document.getElementById('val-perputaran');
